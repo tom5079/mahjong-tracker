@@ -1,0 +1,12 @@
+<script lang="ts">
+	export let count: string
+</script>
+
+<span class="flex justify-center space-x-2">
+	<svg class="inline w-10" viewBox="0 0 600 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<rect width="600" height="100" fill="#F5F5F5" />
+		<rect x="0.5" y="0.5" width="599" height="99" rx="49.5" fill="white" stroke="black" />
+		<circle cx="300" cy="50" r="15" fill="#B91C1C" />
+	</svg>
+	<p>{count}</p>
+</span>
