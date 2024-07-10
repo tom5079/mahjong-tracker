@@ -4,9 +4,10 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Montserrat']
+				sans: ['Montserrat'],
+				mj: ['"LXGW WenKai Mono TC"']
 			}
 		}
 	},
 	plugins: []
-};
+}
