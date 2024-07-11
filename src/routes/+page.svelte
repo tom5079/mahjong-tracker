@@ -15,12 +15,12 @@
 	<section class="mx-auto flex flex-row flex-wrap">
 		<div class="mx-auto flex py-16">
 			<div
-				class="font-mj flex aspect-[3/4] h-36 items-center justify-center rounded-lg border-2 text-7xl text-red-700"
+				class="flex aspect-[3/4] h-36 items-center justify-center rounded-lg border-2 font-mj text-7xl text-red-700"
 			>
 				中
 			</div>
 			<div
-				class="font-mj mx-4 flex aspect-[3/4] h-36 -rotate-90 flex-col items-center justify-center rounded-lg border-2 text-center text-6xl font-extralight"
+				class="mx-4 flex aspect-[3/4] h-36 -rotate-90 flex-col items-center justify-center rounded-lg border-2 text-center font-mj text-6xl font-extralight"
 			>
 				<span>一</span><span class="text-red-700">萬</span>
 			</div>
