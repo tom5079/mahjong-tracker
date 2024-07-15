@@ -5,8 +5,9 @@
 	<h1 class="font-extrabold tracking-tight">Mahjong Tracker</h1>
 
 	<div class="flex flex-row space-x-8 p-2">
-		<button class="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white"
-			>Login</button
+		<a
+			href="https://discord.com/oauth2/authorize?client_id=1259996389589516289&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fapi%2Fauth%2Fdiscord&scope=identify"
+			class="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white">Login</a
 		>
 	</div>
 </nav>
