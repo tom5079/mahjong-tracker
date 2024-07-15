@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let count: string
+	export let count: number
 </script>
 
 <span class="flex justify-center space-x-2">
