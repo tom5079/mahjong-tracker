@@ -1,12 +1,3 @@
-<script lang="ts">
-	import type { PageData } from './$types'
-	import Navbar from '$lib/Navbar.svelte'
-
-	export let data: PageData
-</script>
-
-<Navbar user={data.user} />
-
 <main>
 	<section class="mx-auto flex flex-row flex-wrap">
 		<div class="mx-auto flex py-16">

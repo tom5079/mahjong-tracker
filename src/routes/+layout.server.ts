@@ -1,6 +1,6 @@
 import { getUser } from "$lib/server/discord";
 import { getUserToken } from "$lib/server/user";
-import type { PageServerLoad } from "./$types";
+import type { LayoutServerLoad } from "./$types";
 
 export const load = (async ({ cookies }) => {
     const sessionId = cookies.get('SESSION_ID')
@@ -22,4 +22,4 @@ export const load = (async ({ cookies }) => {
             user: null
         }
     }
-}) satisfies PageServerLoad;
+}) satisfies LayoutServerLoad;

@@ -20,3 +20,11 @@ model UserToken {
   refreshToken String
   expiresAt    DateTime
 }
+
+model Parlor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  website     String
+  members     String[]
+  note        String
+}

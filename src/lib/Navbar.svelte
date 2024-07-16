@@ -4,6 +4,10 @@
 
 	export let user: User | null = null
 	let menuOpened = false
+
+	function close() {
+		menuOpened = false
+	}
 </script>
 
 <nav class="sticky top-0 z-50 flex flex-row items-center justify-between border-b p-4">
@@ -31,6 +35,9 @@
 		class="fixed top-0 z-10 h-full w-full bg-white pt-24 transition-opacity"
 	>
 		<ul class="border-t text-2xl font-medium">
+			<li>
+				<a on:click={close} href="/parlor" class="flex items-center p-8"> Parlors </a>
+			</li>
 			<li data-sveltekit-preload-data="false">
 				{#if user}
 					<a data-sveltekit-reload href="/logout" class="flex items-center p-8">Logout</a>
