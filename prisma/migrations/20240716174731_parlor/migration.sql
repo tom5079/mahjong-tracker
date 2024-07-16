@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Parlor" ALTER COLUMN "moderators" SET DEFAULT ARRAY[]::TEXT[],
+ALTER COLUMN "members" SET DEFAULT ARRAY[]::TEXT[];

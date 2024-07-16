@@ -24,7 +24,8 @@ model UserToken {
 model Parlor {
   id          Int      @id @default(autoincrement())
   name        String
-  website     String
-  members     String[]
+  location    String
+  owner       String
+  website     String?
   note        String
 }

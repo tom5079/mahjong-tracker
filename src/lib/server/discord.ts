@@ -8,6 +8,12 @@ export type User = {
     avatar: string | null,
 }
 
+export type TokenPackage = {
+    accessToken: string,
+    expiresAt: Date,
+    refreshToken: string
+}
+
 export function getUser(accessToken: string): Promise<User> {
     return fetch(
         "https://discord.com/api/users/@me",
@@ -19,7 +25,7 @@ export function getUser(accessToken: string): Promise<User> {
     ).then((res) => res.json())
 }
 
-export async function exchangeToken(code: string) {
+export async function exchangeToken(code: string): Promise<TokenPackage> {
     const {
         access_token: accessToken,
         expires_in: expiresIn,
@@ -46,7 +52,7 @@ export async function exchangeToken(code: string) {
     return { accessToken, expiresAt, refreshToken }
 }
 
-export async function refreshToken(refreshToken: string) {
+export async function refreshToken(refreshToken: string): Promise<TokenPackage> {
     const {
         access_token: accessToken,
         expires_in: expiresIn,
