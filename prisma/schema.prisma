@@ -14,18 +14,42 @@ datasource db {
 }
 
 model UserToken {
-  id           Int      @id @default(autoincrement())
-  sessionId    String   @unique
+  sessionId    String   @id
   accessToken  String
   refreshToken String
   expiresAt    DateTime
 }
 
+model User {
+  id          String  @id
+  username    String
+  avatar      String?
+}
+
 model Parlor {
-  id          Int      @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
   location    String
   owner       String
   website     String?
   note        String
+  members     ParlorMember[]
+  events      Event[]
+}
+
+model ParlorMember {
+  id       Int      @id @default(autoincrement())
+  parlor   Parlor   @relation(fields: [parlorId], references: [id])
+  parlorId Int
+  userId   String
+}
+
+model Event {
+  id          Int     @id @default(autoincrement())
+  name        String
+  date        DateTime
+  location    String
+  description String
+  parlor      Parlor  @relation(fields: [parlorId], references: [id])
+  parlorId    Int
 }

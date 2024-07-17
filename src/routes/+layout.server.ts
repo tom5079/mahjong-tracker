@@ -15,7 +15,7 @@ export const load = (async ({ cookies }) => {
         const accessToken = await getUserToken(sessionId)
 
         return {
-            user: await getUser(accessToken)
+            user: accessToken && await getUser(accessToken)
         }
     } catch {
         return {

@@ -20,7 +20,18 @@
 					<div class="flex flex-grow flex-col space-y-2">
 						<h2 class="text-xl font-semibold">{parlor.name}</h2>
 						<p class="text-sm">{parlor.location}</p>
-						<p class="text-sm">Owner: {parlor.owner}</p>
+						<p class="flex flex-row items-center text-sm">
+							<span>Owner: </span>
+							{#if parlor.ownerInfo}<img
+									class="ml-2 mr-1 inline h-4 w-4 rounded-full"
+									src="https://cdn.discordapp.com/avatars/{parlor.ownerInfo.id}/{parlor.ownerInfo
+										.avatar}.webp"
+									alt="avatar of {parlor.ownerInfo.username}"
+								/>{/if}
+							<span
+								>{#if parlor.ownerInfo}{parlor.ownerInfo.username}{:else}unknown user {parlor.owner}{/if}</span
+							>
+						</p>
 						{#if parlor.note}<p class="text-sm">{parlor.note}</p>{/if}
 					</div>
 					<span class="material-symbols-rounded my-auto">chevron_right</span>

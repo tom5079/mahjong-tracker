@@ -316,7 +316,6 @@
 	function submit() {
 		if (action) {
 			const data = JSON.stringify(action)
-
 			console.log(data)
 		}
 

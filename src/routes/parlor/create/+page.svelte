@@ -29,7 +29,6 @@
 	})
 
 	function onSubmit(token: string) {
-		console.log(token)
 		const formData = new FormData(form)
 		formData.set('token', token)
 
@@ -41,8 +40,6 @@
 		})
 			.then(async (response) => {
 				const body = await response.json()
-
-				console.log(body)
 
 				if (response.ok) {
 					goto(`/parlor/${body.id}`)
@@ -71,7 +68,7 @@
 					>Name (required)</label
 				>
 				<input
-					class="bg-grey-50 block w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					type="text"
 					id="name"
 					name="name"
@@ -82,7 +79,7 @@
 			<div>
 				<label class="mb-2 block text-sm font-medium text-gray-900" for="location">Location</label>
 				<input
-					class="bg-grey-50 block w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					type="text"
 					id="location"
 					name="location"
@@ -91,7 +88,7 @@
 			<div>
 				<label class="mb-2 block text-sm font-medium text-gray-900" for="website">Website</label>
 				<input
-					class="bg-grey-50 block w-full rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					type="text"
 					id="website"
 					name="website"
@@ -103,7 +100,7 @@
 					bind:value={tags}
 					bind:this={textarea}
 					on:input={onTagInput}
-					class="bg-grey-50 block w-full resize-none overflow-hidden rounded-lg border border-gray-300 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					rows="1"
 					id="tags"
 					name="tags"
@@ -112,10 +109,8 @@
 		</div>
 		<div class="flex flex-row items-center justify-end space-x-4 px-4">
 			<p class="font-semibold tracking-tight text-red-500">{error}</p>
-			<button
-				type="button"
-				on:click={() => window.history.back()}
-				class="p-2 px-5 py-2.5 font-semibold">Cancel</button
+			<button type="button" on:click={() => window.history.back()} class="px-5 py-2.5 font-semibold"
+				>Cancel</button
 			>
 			<button
 				type="submit"

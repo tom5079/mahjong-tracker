@@ -14,9 +14,9 @@ export type TokenPackage = {
     refreshToken: string
 }
 
-export function getUser(accessToken: string): Promise<User> {
+export function getUser(accessToken: string, userId: string = '@me'): Promise<User> {
     return fetch(
-        "https://discord.com/api/users/@me",
+        `https://discord.com/api/users/${userId}`,
         {
             headers: {
                 Authorization: `Bearer ${accessToken}`

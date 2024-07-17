@@ -31,10 +31,8 @@ export const POST = (async ({ cookies, request }) => {
     }
 
     const sessionId = getSessionId(cookies)
-    let userToken: string
-    try {
-        userToken = await getUserToken(sessionId)
-    } catch {
+    const userToken = await getUserToken(sessionId)
+    if (!userToken) {
         error(401, 'Unauthorized')
     }
 
@@ -49,7 +47,7 @@ export const POST = (async ({ cookies, request }) => {
     const parlor = await registerParlor({
         name: name!,
         location: data.get('location')?.toString() ?? '',
-        owner: owner.username,
+        owner: owner.id,
         website: data.get('website')?.toString(),
         note: data.get('note')?.toString() ?? ''
     })

@@ -1,4 +1,5 @@
 import prisma from "./prisma"
+import { getUserById } from "./user"
 
 export function registerParlor({
     name,
@@ -24,6 +25,22 @@ export function registerParlor({
     })
 }
 
-export function listParlors() {
-    return prisma.parlor.findMany()
+export async function listParlors() {
+    return await Promise.all((await prisma.parlor.findMany()).map(async (parlor) => {
+        return {
+            ...parlor,
+            ownerInfo: await getUserById(parlor.owner)
+        }
+    }))
+}
+
+export async function getParlor(id: number) {
+    const parlor = await prisma.parlor.findUnique({ where: { id } })
+
+    if (!parlor) { return null }
+
+    return {
+        ...parlor,
+        ownerInfo: await getUserById(parlor.owner)
+    }
 }

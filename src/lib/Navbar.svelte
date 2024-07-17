@@ -11,7 +11,7 @@
 </script>
 
 <nav class="sticky top-0 z-50 flex flex-row items-center justify-between border-b bg-white p-4">
-	<h1 class="font-extrabold tracking-tight">Mahjong Tracker</h1>
+	<a href="/" class="font-extrabold tracking-tight">Mahjong Tracker</a>
 
 	<div class="flex flex-row space-x-8 p-2">
 		{#if user != null}
