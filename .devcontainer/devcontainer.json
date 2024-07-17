@@ -18,7 +18,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "sudo service postgresql start; npm install; npx prisma migrate dev;",
-	"postStartCommand": "sudo service postgresql start; npm run dev",
+	"postStartCommand": "sudo service postgresql start; npm run dev"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
