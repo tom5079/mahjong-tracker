@@ -42,25 +42,6 @@ model Parlor {
   rulesets    Ruleset[]
 }
 
-model ParlorMember {
-  id       Int      @id @default(autoincrement())
-  parlor   Parlor   @relation(fields: [parlorId], references: [id])
-  parlorId Int
-  userId   String
-}
-
-model Event {
-  id          Int     @id @default(autoincrement())
-  name        String
-  date        DateTime
-  location    String
-  description String
-  parlor      Parlor  @relation(fields: [parlorId], references: [id])
-  parlorId    Int
-  ruleset     Ruleset @relation(fields: [rulesetId], references: [id])
-  rulesetId   Int
-}
-
 enum GameType {
   THREE_PLAYER_EAST
   THREE_PLAYER_HANCHAN
@@ -76,24 +57,18 @@ enum TiebreakerPolicy {
 enum EndgamePolicy {
   DISAPPEARS
   TOP
-  DEALER
 }
 
 enum RenchanPolicy {
-  NONE
   TENPAI
   AGARI
+  NONE
+  ALWAYS
 }
 
 enum AllLastPolicy {
-  AGARIYAME_FIRST
-  AGARIYAME_SECOND
-  AGARIYAME_THIRD
-  AGARIYAME_ANY
-  TENPAIYAME_FIRST
-  TENPAIYAME_SECOND
-  TENPAIYAME_THIRD
-  TENPAIYAME_ANY
+  AGARIYAME
+  TENPAIYAME
   NONE
 }
 
@@ -120,6 +95,7 @@ model Ruleset {
   tiebreaker          TiebreakerPolicy
   renchan             RenchanPolicy
   allLast             AllLastPolicy
+  allLastPlacement    Int?
 
   doubleRon           Boolean
   tripleRon           Boolean

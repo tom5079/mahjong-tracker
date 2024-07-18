@@ -12,6 +12,7 @@ declare global {
 	namespace PrismaJson {
 		type Uma = {
 			uma: number[],
+			shizumi: number,
 			binta: number
 		}
 
