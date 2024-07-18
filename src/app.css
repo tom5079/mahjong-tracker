@@ -3,9 +3,17 @@
 @tailwind utilities;
 
 .material-symbols-rounded {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 300,
-  'GRAD' 0,
-  'opsz' 48
+	font-variation-settings:
+		'FILL' 0,
+		'wght' 300,
+		'GRAD' 0,
+		'opsz' 48;
+}
+
+.material-symbols-rounded.filled {
+	font-variation-settings:
+		'FILL' 1,
+		'wght' 300,
+		'GRAD' 0,
+		'opsz' 48;
 }

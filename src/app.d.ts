@@ -9,6 +9,20 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	namespace PrismaJson {
+		type Uma = {
+			uma: number[],
+			binta: number
+		}
+
+		type Scores = {
+			ron: Record<string, number>,
+			tsumo: Record<string, {
+				fromDealer: number,
+				fromNonDealer: number
+			}>
+		}
+	}
 }
 
 export { };

@@ -2,9 +2,6 @@
 	import type { PageData } from './$types'
 
 	export let data: PageData
-
-	let textarea: HTMLTextAreaElement
-	let tags: string
 </script>
 
 <main class="mx-auto max-w-7xl space-y-8 p-4">
@@ -41,47 +38,49 @@
 					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 				/>
 			</div>
-			<fieldset class="flex flex-row space-x-2 rounded border border-solid border-gray-300 p-2">
+			<fieldset class="rounded border border-solid border-gray-300 p-2">
 				<legend class="mb-2 block text-sm font-medium text-gray-900">Format</legend>
-				<div class="flex-1 rounded border">
-					<input
-						class="peer hidden h-0 w-0"
-						type="radio"
-						id="casual"
-						name="format"
-						value="casual"
-						checked
-					/>
-					<label
-						class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
-						for="casual">Casual</label
-					>
-				</div>
-				<div class="flex-1 rounded border">
-					<input
-						class="peer hidden h-0 w-0"
-						type="radio"
-						id="league"
-						name="format"
-						value="league"
-					/>
-					<label
-						class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
-						for="league">League</label
-					>
-				</div>
-				<div class="flex-1 rounded border">
-					<input
-						class="peer hidden h-0 w-0"
-						type="radio"
-						id="tournament"
-						name="format"
-						value="tournament"
-					/>
-					<label
-						class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
-						for="tournament">Tournament</label
-					>
+				<div class="flex flex-row space-x-2">
+					<div class="flex-1 rounded border">
+						<input
+							class="peer hidden h-0 w-0"
+							type="radio"
+							id="casual"
+							name="format"
+							value="casual"
+							checked
+						/>
+						<label
+							class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+							for="casual">Casual</label
+						>
+					</div>
+					<div class="flex-1 rounded border">
+						<input
+							class="peer hidden h-0 w-0"
+							type="radio"
+							id="league"
+							name="format"
+							value="league"
+						/>
+						<label
+							class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+							for="league">League</label
+						>
+					</div>
+					<div class="flex-1 rounded border">
+						<input
+							class="peer hidden h-0 w-0"
+							type="radio"
+							id="tournament"
+							name="format"
+							value="tournament"
+						/>
+						<label
+							class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+							for="tournament">Tournament</label
+						>
+					</div>
 				</div>
 			</fieldset>
 		</div>

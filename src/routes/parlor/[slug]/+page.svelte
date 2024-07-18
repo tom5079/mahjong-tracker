@@ -6,7 +6,12 @@
 
 <main class="space-y-8 p-4">
 	<section>
-		<h1 class="text-2xl font-bold">{data.parlor.name}</h1>
+		<div class="flex flex-row items-center justify-between">
+			<h1 class="text-2xl font-bold">{data.parlor.name}</h1>
+			<a href="{data.slug}/settings" class="material-symbols-rounded filled px-5 py-2.5 text-2xl"
+				>settings</a
+			>
+		</div>
 		<div class="flex flex-row items-center space-x-4 py-4">
 			{#if data.parlor.ownerInfo}<img
 					src="https://cdn.discordapp.com/avatars/{data.parlor.ownerInfo.id}/{data.parlor.ownerInfo

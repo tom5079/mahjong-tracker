@@ -8,6 +8,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -35,6 +39,7 @@ model Parlor {
   note        String
   members     ParlorMember[]
   events      Event[]
+  rulesets    Ruleset[]
 }
 
 model ParlorMember {
@@ -52,4 +57,94 @@ model Event {
   description String
   parlor      Parlor  @relation(fields: [parlorId], references: [id])
   parlorId    Int
+  ruleset     Ruleset @relation(fields: [rulesetId], references: [id])
+  rulesetId   Int
+}
+
+enum GameType {
+  THREE_PLAYER_EAST
+  THREE_PLAYER_HANCHAN
+  FOUR_PLAYER_EAST
+  FOUR_PLAYER_HANCHAN
+}
+
+enum TiebreakerPolicy {
+  SPLIT
+  WIND
+}
+
+enum EndgamePolicy {
+  DISAPPEARS
+  TOP
+  DEALER
+}
+
+enum RenchanPolicy {
+  NONE
+  TENPAI
+  AGARI
+}
+
+enum AllLastPolicy {
+  AGARIYAME_FIRST
+  AGARIYAME_SECOND
+  AGARIYAME_THIRD
+  AGARIYAME_ANY
+  TENPAIYAME_FIRST
+  TENPAIYAME_SECOND
+  TENPAIYAME_THIRD
+  TENPAIYAME_ANY
+  NONE
+}
+
+enum MultironPotPolicy {
+  ATAMAHANE
+  SPLIT
+}
+
+model Ruleset {
+  id                  Int     @id @default(autoincrement())
+
+  name                String
+
+  type                GameType
+
+  startScore          Int
+  returnScore         Int
+  /// [Uma]
+  uma                 Json
+  honba               Int
+  tenpaiFee           Int
+
+  endgamePot          EndgamePolicy
+  tiebreaker          TiebreakerPolicy
+  renchan             RenchanPolicy
+  allLast             AllLastPolicy
+
+  doubleRon           Boolean
+  tripleRon           Boolean
+  multiRonPotPolicy   MultironPotPolicy
+
+  nagashi             String
+  nagashiIsTsumo      Boolean
+
+  chonbo              String
+  chonboAffectsScore  Boolean
+
+  oyaNagashi          Boolean
+  suddenDeath         Int?
+
+  tobi                Boolean
+  tobiAtZero          Boolean
+  calledGame          Int?
+  riichiBelow1000     Boolean
+
+  /// [Score]
+  scores              Json
+
+  note                String
+
+  events              Event[]
+  parlor              Parlor @relation(fields: [parlorId], references: [id])
+  parlorId            Int
 }
