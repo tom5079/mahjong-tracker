@@ -1,5 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 
+import type { ScoringSheet } from "$lib/scoring";
+
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -16,13 +18,7 @@ declare global {
 			binta: number
 		}
 
-		type Scores = {
-			ron: Record<string, number>,
-			tsumo: Record<string, {
-				fromDealer: number,
-				fromNonDealer: number
-			}>
-		}
+		type Scores = ScoringSheet
 	}
 }
 

@@ -19,6 +19,7 @@ export type ScoringSheet = {
         tsumo: Scoring<TsumoScoring>
     }
 }
+
 export function generateScoringSheet({ kiriage, fixed30fu, tsumozon }: { kiriage: boolean, fixed30fu: boolean, tsumozon: boolean }): ScoringSheet {
     const scoringSheet: ScoringSheet = {
         dealer: {
