@@ -42,6 +42,25 @@ model Parlor {
   rulesets    Ruleset[]
 }
 
+model ParlorMember {
+  id       Int      @id @default(autoincrement())
+  parlor   Parlor   @relation(fields: [parlorId], references: [id])
+  parlorId Int
+  userId   String
+}
+
+model Event {
+  id          Int     @id @default(autoincrement())
+  name        String
+  date        DateTime
+  location    String
+  description String
+  parlor      Parlor  @relation(fields: [parlorId], references: [id])
+  parlorId    Int
+  ruleset     Ruleset @relation(fields: [rulesetId], references: [id])
+  rulesetId   Int
+}
+
 enum GameType {
   THREE_PLAYER_EAST
   THREE_PLAYER_HANCHAN
@@ -101,6 +120,9 @@ model Ruleset {
   tripleRon           Boolean
   multiRonPotPolicy   MultironPotPolicy
 
+  /// [Score]
+  scores              Json
+
   nagashi             String
   nagashiIsTsumo      Boolean
 
@@ -108,15 +130,12 @@ model Ruleset {
   chonboAffectsScore  Boolean
 
   oyaNagashi          Boolean
-  suddenDeath         Int?
 
   tobi                Boolean
   tobiAtZero          Boolean
+  suddenDeath         Int?
   calledGame          Int?
   riichiBelow1000     Boolean
-
-  /// [Score]
-  scores              Json
 
   note                String
 

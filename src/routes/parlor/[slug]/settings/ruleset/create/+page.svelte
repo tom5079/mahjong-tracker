@@ -5,7 +5,21 @@
 	let formData: FormData | null
 	let formDataObject: { [key: string]: FormDataEntryValue }
 
+	let scoring:
+		| {
+				type: 'simple'
+				kiriage: boolean
+				fixed30fu: boolean
+				tsumozon: boolean
+		  }
+		| {
+				type: 'custom'
+		  } = { type: 'simple', kiriage: true, fixed30fu: false, tsumozon: true }
+
+	let scoringSheet: { [key: string]: number } = {}
+
 	$: formDataObject = (formData && Object.fromEntries([...formData.entries()])) ?? {}
+	$: console.log(formDataObject)
 
 	onMount(() => {
 		formData = new FormData(form)
@@ -487,24 +501,88 @@
 				</fieldset>
 				<fieldset class="space-y-4 rounded border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Scoring</legend>
-					<label class="flex cursor-pointer items-center">
-						<input type="checkbox" class="peer sr-only" checked />
-						<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Kiriage</span>
-						<div
-							class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
-						/>
-					</label>
-					<label class="flex cursor-pointer items-center">
-						<input type="checkbox" class="peer sr-only" />
-						<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Fixed 30fu</span>
-						<div
-							class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
-						/>
-					</label>
+					<div class="flex flex-row space-x-2">
+						<div class="flex-1 rounded border">
+							<input
+								class="peer hidden h-0 w-0"
+								type="radio"
+								id="scoring_game"
+								name="scoring"
+								value="game"
+							/>
+							<label
+								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								for="scoring_game">Every Game</label
+							>
+						</div>
+						<div class="flex-1 rounded border">
+							<input
+								class="peer hidden h-0 w-0"
+								type="radio"
+								id="scoring_hand"
+								name="scoring"
+								value="hand"
+								checked
+							/>
+							<label
+								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								for="scoring_hand">Every Hand</label
+							>
+						</div>
+						<div class="flex-1 rounded border bg-gray-200">
+							<input
+								class="peer hidden h-0 w-0"
+								type="radio"
+								id="scoring_turn"
+								name="scoring"
+								value="turn"
+							/>
+							<label
+								class="pointer-events-none flex h-full items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								for="scoring_turn">Every Turn</label
+							>
+						</div>
+					</div>
+					{#if formDataObject?.scoring === 'hand'}
+						<div class="flex flex-row space-x-2">
+							<button
+								type="button"
+								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded border py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class:bg-blue-500={scoring.type === 'simple'}
+								class:text-white={scoring.type === 'simple'}
+								on:click={() =>
+									(scoring = { type: 'simple', kiriage: true, fixed30fu: false, tsumozon: true })}
+								>Simple
+							</button>
+							<button
+								type="button"
+								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded border py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class:bg-blue-500={scoring.type === 'custom'}
+								class:text-white={scoring.type === 'custom'}
+								on:click={() => (scoring = { type: 'custom' })}>Custom</button
+							>
+						</div>
+						{#if scoring.type === 'simple'}
+							<label class="flex cursor-pointer items-center">
+								<input type="checkbox" class="peer sr-only" checked />
+								<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Kiriage</span>
+								<div
+									class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+								/>
+							</label>
+							<label class="flex cursor-pointer items-center">
+								<input type="checkbox" class="peer sr-only" />
+								<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Fixed 30 Fu</span>
+								<div
+									class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+								/>
+							</label>
+						{:else}{/if}
+					{/if}
 					{#if formDataObject?.player === 'three'}
 						<label class="flex cursor-pointer items-center">
 							<input type="checkbox" class="peer sr-only" checked />
-							<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Tsumorizon</span>
+							<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Tsumozon</span>
 							<div
 								class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
 							/>
