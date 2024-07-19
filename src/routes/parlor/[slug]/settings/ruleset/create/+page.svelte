@@ -1,5 +1,13 @@
 <script lang="ts">
+	import {
+		type ScoringSheet,
+		type TsumoScoring,
+		generateScoringSheet,
+		isTsumoScoring
+	} from '$lib/scoring'
 	import { onMount } from 'svelte'
+	import { flip } from 'svelte/animate'
+	import { dndzone } from 'svelte-dnd-action'
 
 	let form: HTMLFormElement
 	let formData: FormData | null
@@ -16,7 +24,42 @@
 				type: 'custom'
 		  } = { type: 'simple', kiriage: true, fixed30fu: false, tsumozon: true }
 
-	let scoringSheet: { [key: string]: number } = {}
+	let scoringSheet: ScoringSheet | null = null
+	let scoringSheetEditorState: {
+		player: 'dealer' | 'nonDealer'
+		type: 'ron' | 'tsumo'
+		han: string | null
+	} = {
+		player: 'dealer',
+		type: 'ron',
+		han: null
+	}
+
+	let scoringListToDisplay: [
+		string,
+		number | TsumoScoring | [string, number][] | [string, TsumoScoring][]
+	][] = []
+
+	$: {
+		if (scoring.type === 'simple') {
+			scoringSheet = generateScoringSheet(scoring)
+		}
+	}
+
+	$: {
+		if (scoringSheetEditorState.han === null) {
+			scoringListToDisplay =
+				scoringSheet?.[scoringSheetEditorState.player]?.[scoringSheetEditorState.type] ?? []
+		} else {
+			const [_, chosen] = scoringSheet?.[scoringSheetEditorState.player]?.[
+				scoringSheetEditorState.type
+			]?.find(([han]) => han === scoringSheetEditorState.han) ?? [null, null]
+
+			if (Array.isArray(chosen)) {
+				scoringListToDisplay = chosen
+			}
+		}
+	}
 
 	$: formDataObject = (formData && Object.fromEntries([...formData.entries()])) ?? {}
 	$: console.log(formDataObject)
@@ -42,10 +85,10 @@
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
 				</div>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Type</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -55,11 +98,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="four-players">4 Players</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -68,13 +111,13 @@
 								value="three"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="three-players">3 Players</label
 							>
 						</div>
 					</div>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -84,11 +127,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="hanchan">Hanchan</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -97,7 +140,7 @@
 								value="tonpu"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="tonpu">East only</label
 							>
 						</div>
@@ -129,7 +172,7 @@
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
 				</div>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Uma</legend>
 					<div class="flex flex-row items-center space-x-2">
 						{#if formDataObject?.player !== 'three'}
@@ -215,10 +258,10 @@
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
 				</div>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">End game pot</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -228,11 +271,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="endgame_top">Top</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -241,16 +284,16 @@
 								value="disappears"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="endgame_disappears">Disappears</label
 							>
 						</div>
 					</div>
 				</fieldset>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Tiebreaker</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -260,11 +303,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="tiebreaker_wind">Wind</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -273,16 +316,16 @@
 								value="split"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="tiebreaker_split">Split</label
 							>
 						</div>
 					</div>
 				</fieldset>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Renchan</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -292,11 +335,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="renchan_tenpai">Tenpai</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -305,11 +348,11 @@
 								value="agari"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="renchan_agari">Agari</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -318,11 +361,11 @@
 								value="none"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="renchan_none">None</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -331,16 +374,16 @@
 								value="none"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="renchan_always">Always</label
 							>
 						</div>
 					</div>
 				</fieldset>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">All Last</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -350,11 +393,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="alllast_agariyame">Agariyame</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -363,11 +406,11 @@
 								value="tenpaiyame"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="alllast_tenpaiyame">Tenpaiyame</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -376,14 +419,14 @@
 								value="none"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="alllast_none">None</label
 							>
 						</div>
 					</div>
 					{#if formDataObject?.alllast !== 'none'}
 						<div class="flex flex-row space-x-2">
-							<div class="flex-1 rounded border">
+							<div class="flex-1">
 								<input
 									class="peer hidden h-0 w-0"
 									type="radio"
@@ -393,11 +436,11 @@
 									checked
 								/>
 								<label
-									class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+									class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 									for="alllast_placement_first">1st</label
 								>
 							</div>
-							<div class="flex-1 rounded border">
+							<div class="flex-1">
 								<input
 									class="peer hidden h-0 w-0"
 									type="radio"
@@ -406,11 +449,11 @@
 									value="2"
 								/>
 								<label
-									class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+									class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 									for="alllast_placement_second">2nd</label
 								>
 							</div>
-							<div class="flex-1 rounded border">
+							<div class="flex-1">
 								<input
 									class="peer hidden h-0 w-0"
 									type="radio"
@@ -419,11 +462,11 @@
 									value="3"
 								/>
 								<label
-									class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+									class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 									for="alllast_placement_third">3rd</label
 								>
 							</div>
-							<div class="flex-1 rounded border">
+							<div class="flex-1">
 								<input
 									class="peer hidden h-0 w-0"
 									type="radio"
@@ -432,17 +475,17 @@
 									value="4"
 								/>
 								<label
-									class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+									class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 									for="alllast_placement_any">Any</label
 								>
 							</div>
 						</div>
 					{/if}
 				</fieldset>
-				<fieldset class="space-y-2 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Multiron</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="checkbox"
@@ -451,11 +494,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="multiron_double">Double</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="checkbox"
@@ -464,14 +507,14 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="multiron_triple">Triple</label
 							>
 						</div>
 					</div>
 					<div class="flex flex-row items-center space-x-2">
 						<p class="text-sm">Pot</p>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -481,28 +524,29 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="multiron_pot_atamahane">Atamahane</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
-								type="checkbox"
+								type="radio"
 								id="multiron_pot_split"
-								name="multiron_pot_split"
+								name="multiron_pot"
+								value="split"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="multiron_pot_split">Split</label
 							>
 						</div>
 					</div>
 				</fieldset>
-				<fieldset class="space-y-4 rounded border border-solid border-gray-300 px-2 pb-2">
+				<fieldset class="space-y-4 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Scoring</legend>
 					<div class="flex flex-row space-x-2">
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -511,11 +555,11 @@
 								value="game"
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="scoring_game">Every Game</label
 							>
 						</div>
-						<div class="flex-1 rounded border">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -525,11 +569,11 @@
 								checked
 							/>
 							<label
-								class="flex h-full cursor-pointer items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="scoring_hand">Every Hand</label
 							>
 						</div>
-						<div class="flex-1 rounded border bg-gray-200">
+						<div class="flex-1">
 							<input
 								class="peer hidden h-0 w-0"
 								type="radio"
@@ -538,7 +582,7 @@
 								value="turn"
 							/>
 							<label
-								class="pointer-events-none flex h-full items-center justify-center py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="pointer-events-none flex h-full items-center justify-center rounded-lg border bg-gray-200 py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								for="scoring_turn">Every Turn</label
 							>
 						</div>
@@ -547,7 +591,7 @@
 						<div class="flex flex-row space-x-2">
 							<button
 								type="button"
-								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded border py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								class:bg-blue-500={scoring.type === 'simple'}
 								class:text-white={scoring.type === 'simple'}
 								on:click={() =>
@@ -556,44 +600,201 @@
 							</button>
 							<button
 								type="button"
-								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded border py-2.5 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
+								class="flex h-full flex-1 cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
 								class:bg-blue-500={scoring.type === 'custom'}
 								class:text-white={scoring.type === 'custom'}
 								on:click={() => (scoring = { type: 'custom' })}>Custom</button
 							>
 						</div>
 						{#if scoring.type === 'simple'}
-							<label class="flex cursor-pointer items-center">
-								<input type="checkbox" class="peer sr-only" checked />
-								<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Kiriage</span>
+							<button
+								type="button"
+								on:click={() => {
+									if (scoring.type === 'simple') {
+										scoring = { ...scoring, kiriage: !scoring.kiriage }
+									}
+								}}
+								class="group flex w-full cursor-pointer items-center justify-between"
+							>
+								<span class="ms-3 text-sm font-medium text-gray-900">Kiriage</span>
 								<div
-									class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+									class="relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] group-focus:outline-none group-focus:ring-4 group-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700"
+									class:bg-blue-600={scoring.kiriage}
+									class:after:translate-x-full={scoring.kiriage}
+									class:after:border-white={scoring.kiriage}
+									class:rtl:after:-translate-x-full={scoring.kiriage}
+									class:dark:ring-blue-800={scoring.kiriage}
 								/>
-							</label>
-							<label class="flex cursor-pointer items-center">
-								<input type="checkbox" class="peer sr-only" />
-								<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Fixed 30 Fu</span>
+							</button>
+							<button
+								type="button"
+								on:click={() => {
+									if (scoring.type === 'simple') {
+										scoring = { ...scoring, fixed30fu: !scoring.fixed30fu }
+									}
+								}}
+								class="group flex w-full cursor-pointer items-center justify-between"
+							>
+								<span class="ms-3 text-sm font-medium text-gray-900">Fixed 30 Fu</span>
 								<div
-									class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
+									class="relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] group-focus:outline-none group-focus:ring-4 group-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700"
+									class:bg-blue-600={scoring.fixed30fu}
+									class:after:translate-x-full={scoring.fixed30fu}
+									class:after:border-white={scoring.fixed30fu}
+									class:rtl:after:-translate-x-full={scoring.fixed30fu}
+									class:dark:ring-blue-800={scoring.fixed30fu}
 								/>
-							</label>
-						{:else}{/if}
-					{/if}
-					{#if formDataObject?.player === 'three'}
-						<label class="flex cursor-pointer items-center">
-							<input type="checkbox" class="peer sr-only" checked />
-							<span class="mr-auto ms-3 text-sm font-medium text-gray-900">Tsumozon</span>
-							<div
-								class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"
-							/>
-						</label>
+							</button>
+							{#if formDataObject?.player === 'three'}
+								<button
+									type="button"
+									on:click={() => {
+										if (scoring.type === 'simple') {
+											scoring = { ...scoring, tsumozon: !scoring.tsumozon }
+										}
+									}}
+									class="group flex w-full cursor-pointer items-center justify-between"
+								>
+									<span class="ms-3 text-sm font-medium text-gray-900">Tsumozon</span>
+									<div
+										class="relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] group-focus:outline-none group-focus:ring-4 group-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700"
+										class:bg-blue-600={scoring.tsumozon}
+										class:after:translate-x-full={scoring.tsumozon}
+										class:after:border-white={scoring.tsumozon}
+										class:rtl:after:-translate-x-full={scoring.tsumozon}
+										class:dark:ring-blue-800={scoring.tsumozon}
+									/>
+								</button>
+							{/if}
+						{:else}
+							<div class="flex w-full flex-col space-y-4 border-t pt-4">
+								<div class="flex w-full flex-row space-x-2">
+									<button
+										type="button"
+										class="flex-1 items-center justify-center rounded-lg border py-4 text-sm"
+										class:bg-blue-500={scoringSheetEditorState.player === 'dealer'}
+										class:text-white={scoringSheetEditorState.player === 'dealer'}
+										on:click={() =>
+											(scoringSheetEditorState = {
+												player: 'dealer',
+												type: scoringSheetEditorState.type,
+												han: null
+											})}
+									>
+										Dealer
+									</button>
+									<button
+										type="button"
+										class="flex-1 items-center justify-center rounded-lg border py-4 text-sm"
+										class:bg-blue-500={scoringSheetEditorState.player === 'nonDealer'}
+										class:text-white={scoringSheetEditorState.player === 'nonDealer'}
+										on:click={() =>
+											(scoringSheetEditorState = {
+												player: 'nonDealer',
+												type: scoringSheetEditorState.type,
+												han: null
+											})}
+									>
+										Non Dealer
+									</button>
+								</div>
+								<div class="flex w-full flex-row space-x-2">
+									<button
+										type="button"
+										class="flex-1 items-center justify-center rounded-lg border py-4 text-sm"
+										class:bg-blue-500={scoringSheetEditorState.type === 'ron'}
+										class:text-white={scoringSheetEditorState.type === 'ron'}
+										on:click={() =>
+											(scoringSheetEditorState = {
+												player: scoringSheetEditorState.player,
+												type: 'ron',
+												han: null
+											})}
+									>
+										Ron
+									</button>
+									<button
+										type="button"
+										class="flex-1 items-center justify-center rounded-lg border py-4 text-sm"
+										class:bg-blue-500={scoringSheetEditorState.type === 'tsumo'}
+										class:text-white={scoringSheetEditorState.type === 'tsumo'}
+										on:click={() =>
+											(scoringSheetEditorState = {
+												player: scoringSheetEditorState.player,
+												type: 'tsumo',
+												han: null
+											})}
+									>
+										Tsumo
+									</button>
+								</div>
+								<div class="w-full divide-y">
+									{#if scoringSheetEditorState.han !== null}
+										<div class="flex flex-row items-center">
+											<button
+												on:click={() => (scoringSheetEditorState.han = null)}
+												type="button"
+												class="flex flex-row items-center space-x-4 p-4"
+											>
+												<span class="material-symbols-rounded">arrow_back</span>
+												<span class="text-lg font-semibold">{scoringSheetEditorState.han}</span
+												></button
+											>
+										</div>
+									{/if}
+									{#each scoringListToDisplay as [name, item]}
+										<div class="flex w-full flex-row items-center p-4">
+											<p class="mr-8 text-lg font-semibold">
+												{name}
+											</p>
+											{#if typeof item === 'number'}
+												<input
+													type="number"
+													bind:value={item}
+													class="ml-auto w-24 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+												/>
+											{:else if isTsumoScoring(item)}
+												<input
+													type="text"
+													bind:value={item.fromNonDealer}
+													class="ml-auto w-24 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+												/>
+												{#if scoringSheetEditorState.player === 'dealer'}
+													<span class="px-2 text-sm">ALL</span>
+												{:else}
+													<span class="px-2 text-sm">/</span>
+													<input
+														type="text"
+														bind:value={item.fromDealer}
+														class="w-24 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+													/>
+												{/if}
+											{:else}
+												<button
+													on:click={() =>
+														(scoringSheetEditorState = {
+															player: scoringSheetEditorState.player,
+															type: scoringSheetEditorState.type,
+															han: name
+														})}
+													type="button"
+													class="material-symbols-rounded flex-1 py-4 pr-4 text-right"
+												>
+													chevron_right
+												</button>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
 					{/if}
 				</fieldset>
 			</div>
 			<div>
 				<button
 					type="submit"
-					class="block w-full rounded-lg border border-gray-300 bg-blue-500 p-2.5 text-sm text-white focus:border-blue-500 focus:ring-blue-500"
+					class="block w-full rounded-lg border border-gray-300 bg-blue-500 py-4 text-sm text-white focus:border-blue-500 focus:ring-blue-500"
 				>
 					Create
 				</button>
