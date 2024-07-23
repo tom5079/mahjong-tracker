@@ -61,11 +61,14 @@ model Event {
   rulesetId   Int
 }
 
-enum GameType {
-  THREE_PLAYER_EAST
-  THREE_PLAYER_HANCHAN
-  FOUR_PLAYER_EAST
-  FOUR_PLAYER_HANCHAN
+enum Players {
+  FOUR
+  THREE
+}
+
+enum GameLength {
+  HANCHAN
+  TONPU
 }
 
 enum TiebreakerPolicy {
@@ -91,9 +94,20 @@ enum AllLastPolicy {
   NONE
 }
 
-enum MultironPotPolicy {
+enum MultiRonPotPolicy {
   ATAMAHANE
   SPLIT
+}
+
+enum MultiRonHonbaPolicy {
+  ATAMAHANE
+  SPLIT
+  ALL
+}
+
+enum Record {
+  GAME
+  HAND
 }
 
 model Ruleset {
@@ -101,7 +115,8 @@ model Ruleset {
 
   name                String
 
-  type                GameType
+  player              Players
+  length              GameLength
 
   startScore          Int
   returnScore         Int
@@ -118,7 +133,10 @@ model Ruleset {
 
   doubleRon           Boolean
   tripleRon           Boolean
-  multiRonPotPolicy   MultironPotPolicy
+  multiRonPotPolicy   MultiRonPotPolicy
+  multiRonHonbaPolicy MultiRonHonbaPolicy
+
+  record              Record
 
   /// [Score]
   scores              Json
@@ -126,16 +144,16 @@ model Ruleset {
   nagashi             String
   nagashiIsTsumo      Boolean
 
-  chonbo              String
-  chonboAffectsScore  Boolean
+  /// [Chonbo]
+  chonbo              Json
 
   oyaNagashi          Boolean
 
   tobi                Boolean
   tobiAtZero          Boolean
+  riichiBelow1000     Boolean
   suddenDeath         Int?
   calledGame          Int?
-  riichiBelow1000     Boolean
 
   note                String
 

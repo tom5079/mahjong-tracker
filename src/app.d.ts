@@ -13,12 +13,35 @@ declare global {
 	}
 	namespace PrismaJson {
 		type Uma = {
-			uma: number[],
-			shizumi: number,
-			binta: number
+			type: 'simple'
+			uma: [number, number, number, number]
+		} | {
+			type: 'floating'
+			A: [number, number, number, number]
+			B: [number, number, number, number]
+			C: [number, number, number, number]
 		}
 
 		type Scores = ScoringSheet
+
+		type Chonbo = ({
+			type: 'score',
+			name: string
+		} | {
+			type: 'fixed',
+			point: number
+		} | {
+			type: 'custom',
+			dealer: {
+				toNonDealer: number
+			},
+			nonDealer: {
+				toDealer: number,
+				toNonDealer: number
+			}
+		}) & {
+			affectsScore: boolean
+		}
 	}
 }
 

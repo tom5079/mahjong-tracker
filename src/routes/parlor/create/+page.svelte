@@ -17,7 +17,6 @@
 	}
 
 	onMount(() => {
-		// @ts-ignore
 		form.addEventListener('submit', (event) => {
 			event.preventDefault()
 			// @ts-ignore

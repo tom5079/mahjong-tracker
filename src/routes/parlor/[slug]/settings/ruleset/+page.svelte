@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from '../$types'
+	import type { PageData } from './$types'
 
 	export let data: PageData
 </script>
@@ -13,5 +13,10 @@
 		>
 			<span class="material-symbols-rounded mr-2">add</span> New</a
 		>
+	</section>
+	<section class="flex flex-col">
+		{#each data.rulesets as ruleset}
+			<p>{ruleset.name}</p>
+		{/each}
 	</section>
 </main>
