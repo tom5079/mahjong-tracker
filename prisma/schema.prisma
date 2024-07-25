@@ -52,7 +52,6 @@ model ParlorMember {
 model Event {
   id          Int     @id @default(autoincrement())
   name        String
-  date        DateTime
   location    String
   description String
   parlor      Parlor  @relation(fields: [parlorId], references: [id])

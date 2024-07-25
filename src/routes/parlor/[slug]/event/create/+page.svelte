@@ -1,0 +1,103 @@
+<script lang="ts">
+	import { onMount } from 'svelte'
+	import type { PageData } from './$types'
+	import { goto } from '$app/navigation'
+
+	export let data: PageData
+
+	let form: HTMLFormElement
+
+	let description = ''
+	let textarea: HTMLTextAreaElement
+
+	let error = ''
+
+	function onDescriptionInput() {
+		textarea.style.height = 'auto'
+		textarea.style.height = `${textarea.scrollHeight}px`
+	}
+
+	onMount(() => {
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault()
+
+			const response = await fetch(`create`, {
+				method: 'POST',
+				body: new FormData(form)
+			})
+
+			const json = await response.json()
+
+			if (response.ok) {
+				goto(json.eventId)
+			} else {
+				error = json.message
+			}
+		})
+	})
+</script>
+
+<main class="mx-auto max-w-2xl space-y-4 p-4">
+	<h1 class="text-2xl">New event @ {data.parlor.name}</h1>
+	<form bind:this={form}>
+		<div class="flex flex-col space-y-4">
+			<div>
+				<label for="name" class="mb-2 block text-sm font-medium text-gray-900">Name</label>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					required
+				/>
+			</div>
+			<div>
+				<label for="location" class="mb-2 block text-sm font-medium text-gray-900">Location</label>
+				<input
+					type="text"
+					id="location"
+					name="location"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+				/>
+			</div>
+			<div>
+				<label for="description" class="mb-2 block text-sm font-medium text-gray-900"
+					>Description</label
+				>
+				<textarea
+					bind:value={description}
+					bind:this={textarea}
+					on:input={onDescriptionInput}
+					class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+					rows="1"
+					id="description"
+					name="description"
+				/>
+			</div>
+			<div>
+				<div class="flex flex-row items-center justify-between py-2">
+					<label for="ruleset" class="mb-2 block text-sm font-medium text-gray-900">Ruleset</label>
+					<a href="../settings/ruleset/create" class="rounded-lg bg-blue-500 px-5 py-2.5 text-white"
+						>New Ruleset</a
+					>
+				</div>
+				<select
+					id="ruleset"
+					name="ruleset"
+					class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+				>
+					{#each data.rulesets as ruleset}
+						<option value={ruleset.id}>{ruleset.name}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="mt-8 flex flex-row items-center justify-end">
+			<p class="flex-1 text-right font-bold text-red-500">{error}</p>
+			<button type="button" on:click={() => window.history.back()} class="p-2 px-5 py-4"
+				>Cancel</button
+			>
+			<button type="submit" class="rounded-lg bg-blue-500 p-2 px-5 py-4 text-white">Create</button>
+		</div>
+	</form>
+</main>

@@ -29,12 +29,22 @@
 		<div class="flex flex-row items-center justify-between">
 			<h2 class="text-xl font-bold">Events</h2>
 			<a
-				href="{data.slug}/create_event"
-				class="flex flex-row space-x-2 rounded bg-blue-500 p-2.5 text-white"
+				href="{data.slug}/event/create"
+				class="flex flex-row space-x-2 rounded-lg bg-blue-500 p-4 text-white"
 			>
 				<span class="material-symbols-rounded">add</span> New Event
 			</a>
 		</div>
+		{#each data.events as event}
+			<a href="{data.slug}/event/{event.id}" class="flex flex-row space-x-4 py-4">
+				<div class="flex flex-grow flex-col space-y-2">
+					<h2 class="text-xl font-semibold">{event.name}</h2>
+					<p class="text-sm">{event.location}</p>
+					<p class="text-sm">{event.description}</p>
+				</div>
+				<span class="material-symbols-rounded my-auto">chevron_right</span>
+			</a>
+		{/each}
 	</section>
 	<section>
 		<div class="flex flex-row items-center justify-between">

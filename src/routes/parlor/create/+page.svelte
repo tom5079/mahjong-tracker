@@ -55,13 +55,13 @@
 	}
 </script>
 
-<main class="mx-auto max-w-7xl">
+<main class="mx-auto max-w-2xl">
 	<section class="px-4 py-8">
 		<h1 class="text-2xl">New parlor</h1>
 	</section>
 	<form bind:this={form} method="POST">
 		<input type="hidden" name="token" />
-		<div class="mx-auto mb-6 grid gap-6 p-4 md:grid-cols-2">
+		<div class="flex flex-col space-x-6 p-4">
 			<div>
 				<label class="mb-2 block text-sm font-medium text-gray-900" for="name"
 					>Name (required)</label
