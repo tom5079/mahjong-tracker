@@ -61,7 +61,7 @@
 	</section>
 	<form bind:this={form} method="POST">
 		<input type="hidden" name="token" />
-		<div class="flex flex-col space-x-6 p-4">
+		<div class="flex flex-col space-y-4 p-4">
 			<div>
 				<label class="mb-2 block text-sm font-medium text-gray-900" for="name"
 					>Name (required)</label
@@ -114,7 +114,7 @@
 			<button
 				type="submit"
 				disabled={loading}
-				class="flex flex-row rounded border bg-blue-500 px-5 py-2.5 font-semibold text-white disabled:bg-indigo-500"
+				class="flex flex-row rounded-lg border bg-blue-500 px-5 py-2.5 font-semibold text-white disabled:bg-indigo-500"
 				>{#if loading}<svg
 						class="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
 						xmlns="http://www.w3.org/2000/svg"

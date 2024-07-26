@@ -11,15 +11,9 @@ export const load = (async ({ cookies }) => {
         }
     }
 
-    try {
-        const accessToken = await getUserToken(sessionId)
+    const accessToken = await getUserToken(sessionId)
 
-        return {
-            user: accessToken && await getUser(accessToken)
-        }
-    } catch {
-        return {
-            user: null
-        }
+    return {
+        user: accessToken != null ? await getUser(accessToken) : null
     }
 }) satisfies LayoutServerLoad;

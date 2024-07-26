@@ -7,9 +7,9 @@ import { error, type RequestHandler } from "@sveltejs/kit"
 export const POST = (async ({ params, request }) => {
     const data = await request.formData()
 
-    const parlor = +(params.slug ?? -1)
+    const parlorId = +(params.parlor ?? NaN)
 
-    if (parlor < 0) {
+    if (isNaN(parlorId)) {
         error(400, 'Invalid parlor')
     }
 
@@ -288,7 +288,7 @@ export const POST = (async ({ params, request }) => {
             suddenDeath,
             calledGame,
             note: data.get('note')?.toString() ?? '',
-            parlorId: parlor
+            parlorId
         }
     })
 

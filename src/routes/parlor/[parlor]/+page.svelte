@@ -4,12 +4,13 @@
 	export let data: PageData
 </script>
 
-<main class="space-y-8 p-4">
+<main class="mx-auto max-w-2xl p-4">
 	<section>
 		<div class="flex flex-row items-center justify-between">
 			<h1 class="text-2xl font-bold">{data.parlor.name}</h1>
-			<a href="{data.slug}/settings" class="material-symbols-rounded filled px-5 py-2.5 text-2xl"
-				>settings</a
+			<a
+				href="{data.parlor.id}/settings"
+				class="material-symbols-rounded filled px-5 py-2.5 text-2xl">settings</a
 			>
 		</div>
 		<div class="flex flex-row items-center space-x-4 py-4">
@@ -29,22 +30,24 @@
 		<div class="flex flex-row items-center justify-between">
 			<h2 class="text-xl font-bold">Events</h2>
 			<a
-				href="{data.slug}/event/create"
+				href="{data.parlor.id}/event/create"
 				class="flex flex-row space-x-2 rounded-lg bg-blue-500 p-4 text-white"
 			>
 				<span class="material-symbols-rounded">add</span> New Event
 			</a>
 		</div>
-		{#each data.events as event}
-			<a href="{data.slug}/event/{event.id}" class="flex flex-row space-x-4 py-4">
-				<div class="flex flex-grow flex-col space-y-2">
-					<h2 class="text-xl font-semibold">{event.name}</h2>
-					<p class="text-sm">{event.location}</p>
-					<p class="text-sm">{event.description}</p>
-				</div>
-				<span class="material-symbols-rounded my-auto">chevron_right</span>
-			</a>
-		{/each}
+		<div class="divide-y py-4">
+			{#each data.events as event}
+				<a href="{data.parlor.id}/event/{event.id}" class="flex flex-row space-x-4 py-4">
+					<div class="flex flex-grow flex-col space-y-2">
+						<h2 class="text-xl font-semibold">{event.name}</h2>
+						<p class="text-sm">{event.location}</p>
+						<p class="text-sm">{event.description}</p>
+					</div>
+					<span class="material-symbols-rounded my-auto">chevron_right</span>
+				</a>
+			{/each}
+		</div>
 	</section>
 	<section>
 		<div class="flex flex-row items-center justify-between">

@@ -42,6 +42,8 @@
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^5.17.0",
+		"moment": "^2.30.1",
+		"moment-timezone": "^0.5.45",
 		"uuid": "^10.0.0"
 	}
 }

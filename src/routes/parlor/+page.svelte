@@ -4,13 +4,13 @@
 	export let data: PageData
 </script>
 
-<main>
+<main class="mx-auto max-w-2xl">
 	<section class="p-8">
 		<div class="flex flex-row items-center">
 			<h1 class="text-2xl font-medium">Parlors</h1>
 			<a
 				href="/parlor/create"
-				class="ml-auto flex flex-row items-center rounded border bg-blue-500 p-2 text-white"
+				class="ml-auto flex flex-row items-center rounded-lg border bg-blue-500 p-4 text-white"
 				><span class="material-symbols-rounded">add</span> New Parlor</a
 			>
 		</div>

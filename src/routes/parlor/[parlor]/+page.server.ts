@@ -3,9 +3,9 @@ import type { PageServerLoad } from "./$types";
 import prisma from "$lib/server/prisma";
 
 export const load = (async ({ params }) => {
-    const parlorId = +(params.slug ?? -1)
+    const parlorId = +(params.parlor ?? NaN)
 
-    if (isNaN(parlorId) || parlorId < 0) {
+    if (isNaN(parlorId)) {
         error(400, 'Invalid parlor')
     }
 

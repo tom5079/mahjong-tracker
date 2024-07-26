@@ -42,6 +42,36 @@ declare global {
 		}) & {
 			affectsScore: boolean
 		}
+
+		type EventJoinPolicy = {
+			type: 'manual'
+		} | {
+			type: 'auto',
+			until?: string
+		}
+
+		type Action = {
+			type: 'ron'
+			loser: string
+			scores: Record<string, number>
+		} | {
+			type: 'tsumo'
+			winner: string
+			scores: Record<string, number>
+		} | {
+			type: 'draw'
+			tenpai: string[]
+		} | {
+			type: 'nagashi'
+			players: string[]
+		} | {
+			type: 'chonbo'
+			player: string
+		} | {
+			type: 'riichi',
+			player: string
+		}
+		type Actions = Action[]
 	}
 }
 

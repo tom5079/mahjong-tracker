@@ -3,16 +3,19 @@ import type { PageServerLoad } from "./$types";
 import prisma from "$lib/server/prisma";
 
 export const load = (async ({ params }) => {
-    const parlorId = +(params.slug ?? -1)
+    const eventId = +(params.event ?? NaN)
 
-    if (parlorId < 0) {
-        error(400, 'Invalid parlor')
+    if (isNaN(eventId)) {
+        error(400, 'Invalid event')
     }
 
     return {
-        rulesets: await prisma.ruleset.findMany({
+        attendee: await prisma.eventAttendee.findMany({
             where: {
-                parlorId: parlorId
+                eventId
+            },
+            include: {
+                user: true
             }
         })
     }

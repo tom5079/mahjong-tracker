@@ -2,10 +2,16 @@
 	import { onMount } from 'svelte'
 	import type { PageData } from './$types'
 	import { goto } from '$app/navigation'
+	import Fieldset from '$lib/form/Fieldset.svelte'
+	import Radio from '$lib/form/Radio.svelte'
+	import Label from '$lib/form/Label.svelte'
+	import Datetime from '$lib/form/Datetime.svelte'
+	import moment from 'moment'
 
 	export let data: PageData
 
 	let form: HTMLFormElement
+	let formData: Record<string, FormDataEntryValue>
 
 	let description = ''
 	let textarea: HTMLTextAreaElement
@@ -18,12 +24,21 @@
 	}
 
 	onMount(() => {
+		formData = Object.fromEntries([...new FormData(form).entries()])
 		form.addEventListener('submit', async (event) => {
 			event.preventDefault()
 
+			const body = new FormData(form)
+
+			const joinPolicyUntil = body.get('joinPolicyUntil')?.toString()
+
+			if (joinPolicyUntil) {
+				body.set('joinPolicyUntil', moment(joinPolicyUntil).utc().format())
+			}
+
 			const response = await fetch(`create`, {
 				method: 'POST',
-				body: new FormData(form)
+				body
 			})
 
 			const json = await response.json()
@@ -39,7 +54,10 @@
 
 <main class="mx-auto max-w-2xl space-y-4 p-4">
 	<h1 class="text-2xl">New event @ {data.parlor.name}</h1>
-	<form bind:this={form}>
+	<form
+		on:change={() => (formData = Object.fromEntries([...new FormData(form).entries()]))}
+		bind:this={form}
+	>
 		<div class="flex flex-col space-y-4">
 			<div>
 				<label for="name" class="mb-2 block text-sm font-medium text-gray-900">Name</label>
@@ -91,6 +109,27 @@
 					{/each}
 				</select>
 			</div>
+			<Fieldset name="Join Policy">
+				<Radio
+					name="joinPolicy"
+					values={[
+						{
+							value: 'manual',
+							label: 'Manual'
+						},
+						{
+							value: 'auto',
+							label: 'Auto Approve'
+						}
+					]}
+					selected={formData?.joinPolicy?.toString()}
+				/>
+				<div class="p-2" class:hidden={formData?.joinPolicy?.toString() !== 'auto'}>
+					<Label label="Until">
+						<Datetime name="joinPolicyUntil" min={moment().format().slice(0, 16)} />
+					</Label>
+				</div>
+			</Fieldset>
 		</div>
 		<div class="mt-8 flex flex-row items-center justify-end">
 			<p class="flex-1 text-right font-bold text-red-500">{error}</p>

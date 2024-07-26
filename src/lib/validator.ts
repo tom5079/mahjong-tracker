@@ -1,3 +1,4 @@
+import moment from "moment"
 import type { ScoringSheet } from "./scoring"
 
 export function validateUma(uma: any): uma is PrismaJson.Uma {
@@ -36,4 +37,15 @@ export function validateChonbo(chonbo: any, scoring: ScoringSheet): chonbo is Pr
             (chonbo.dealer.toNonDealer >= 0 && chonbo.nonDealer.toDealer >= 0 && chonbo.nonDealer.toNonDealer >= 0) &&
             (chonbo.dealer.toNonDealer % 100 === 0 && chonbo.nonDealer.toDealer % 100 === 0 && chonbo.nonDealer.toNonDealer % 100 === 0)
         )
+}
+
+export function validateJoinPolicy(joinPolicy: any): joinPolicy is PrismaJson.EventJoinPolicy {
+    return joinPolicy != null &&
+        typeof joinPolicy === 'object' &&
+        (joinPolicy.type === 'manual' ||
+            (joinPolicy.type === 'auto' &&
+                (joinPolicy.until == null ||
+                    (moment(joinPolicy.until).isValid() &&
+                        moment(joinPolicy.until).utcOffset() === 0 &&
+                        moment(joinPolicy.until) > moment()))))
 }

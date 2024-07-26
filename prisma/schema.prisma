@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,39 +19,109 @@ model UserToken {
 }
 
 model User {
-  id          String  @id
-  username    String
-  avatar      String?
+  id              String  @id
+  avatar          String?
+  username        String
+  attendedEvents  EventAttendee[]
 }
 
 model Parlor {
-  id          Int             @id @default(autoincrement())
-  name        String
-  location    String
-  owner       String
-  website     String?
-  note        String
-  members     ParlorMember[]
-  events      Event[]
-  rulesets    Ruleset[]
+  id       Int            @id @default(autoincrement())
+  name     String
+  location String
+  owner    String
+  website  String?
+  note     String
+  events   Event[]
+  members  ParlorMember[]
+  rulesets Ruleset[]
 }
 
 model ParlorMember {
-  id       Int      @id @default(autoincrement())
-  parlor   Parlor   @relation(fields: [parlorId], references: [id])
+  id       Int    @id @default(autoincrement())
   parlorId Int
   userId   String
+  parlor   Parlor @relation(fields: [parlorId], references: [id])
 }
 
 model Event {
-  id          Int     @id @default(autoincrement())
-  name        String
-  location    String
-  description String
-  parlor      Parlor  @relation(fields: [parlorId], references: [id])
-  parlorId    Int
-  ruleset     Ruleset @relation(fields: [rulesetId], references: [id])
-  rulesetId   Int
+  id              Int                @id @default(autoincrement())
+  name            String
+  location        String
+  description     String
+  parlorId        Int
+  rulesetId       Int
+  /// [EventJoinPolicy]
+  joinPolicy      Json
+  parlor          Parlor             @relation(fields: [parlorId], references: [id])
+  ruleset         Ruleset            @relation(fields: [rulesetId], references: [id])
+  attendees       EventAttendee[]
+  games           Game[]
+}
+
+model EventAttendee {
+  user    User                   @relation(fields: [userId], references: [id])
+  userId  String
+  eventId Int
+  status  EventJoinRequestStatus
+  event   Event                  @relation(fields: [eventId], references: [id])
+  @@id([userId, eventId])
+}
+
+model Game {
+  id              Int      @id @default(autoincrement())
+  eventId         Int
+  startTime       DateTime
+  durationSeconds Int
+  users           String[]
+  /// [Actions]
+  actions         Json
+  event           Event    @relation(fields: [eventId], references: [id])
+}
+
+model Ruleset {
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  startScore          Int
+  returnScore         Int
+  /// [Uma]
+  uma                 Json
+  honba               Int
+  tenpaiFee           Int
+  endgamePot          EndgamePolicy
+  tiebreaker          TiebreakerPolicy
+  renchan             RenchanPolicy
+  allLast             AllLastPolicy
+  doubleRon           Boolean
+  tripleRon           Boolean
+  nagashi             String
+  nagashiIsTsumo      Boolean
+  oyaNagashi          Boolean
+  suddenDeath         Int?
+  tobi                Boolean
+  tobiAtZero          Boolean
+  calledGame          Int?
+  riichiBelow1000     Boolean
+  /// [Score]
+  scores              Json
+  note                String
+  parlorId            Int
+  allLastPlacement    Int?
+  multiRonHonbaPolicy MultiRonHonbaPolicy
+  multiRonPotPolicy   MultiRonPotPolicy
+  length              GameLength
+  player              Players
+  record              Record
+  /// [Chonbo]
+  chonbo              Json
+  events              Event[]
+  parlor              Parlor              @relation(fields: [parlorId], references: [id])
+}
+
+enum EventJoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 enum Players {
@@ -81,9 +145,9 @@ enum EndgamePolicy {
 }
 
 enum RenchanPolicy {
+  NONE
   TENPAI
   AGARI
-  NONE
   ALWAYS
 }
 
@@ -107,56 +171,4 @@ enum MultiRonHonbaPolicy {
 enum Record {
   GAME
   HAND
-}
-
-model Ruleset {
-  id                  Int     @id @default(autoincrement())
-
-  name                String
-
-  player              Players
-  length              GameLength
-
-  startScore          Int
-  returnScore         Int
-  /// [Uma]
-  uma                 Json
-  honba               Int
-  tenpaiFee           Int
-
-  endgamePot          EndgamePolicy
-  tiebreaker          TiebreakerPolicy
-  renchan             RenchanPolicy
-  allLast             AllLastPolicy
-  allLastPlacement    Int?
-
-  doubleRon           Boolean
-  tripleRon           Boolean
-  multiRonPotPolicy   MultiRonPotPolicy
-  multiRonHonbaPolicy MultiRonHonbaPolicy
-
-  record              Record
-
-  /// [Score]
-  scores              Json
-
-  nagashi             String
-  nagashiIsTsumo      Boolean
-
-  /// [Chonbo]
-  chonbo              Json
-
-  oyaNagashi          Boolean
-
-  tobi                Boolean
-  tobiAtZero          Boolean
-  riichiBelow1000     Boolean
-  suddenDeath         Int?
-  calledGame          Int?
-
-  note                String
-
-  events              Event[]
-  parlor              Parlor @relation(fields: [parlorId], references: [id])
-  parlorId            Int
 }
