@@ -232,8 +232,6 @@ export const POST = (async ({ params, request }) => {
 
     const nagashiScore = scoringSheet.dealer.tsumo.find(([name]) => name === nagashi)?.[1]
 
-    console.log(nagashi, nagashiScore)
-
     if (nagashi == null || nagashi !== 'none' && nagashiScore == null) {
         error(400, 'Invalid nagashi')
     }

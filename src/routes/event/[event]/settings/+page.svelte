@@ -6,7 +6,7 @@
 
 <main class="mx-auto max-w-2xl">
 	<section class="p-4">
-		<h1 class="text-2xl font-bold">{data.event.name} @ {data.parlor.name} Settings</h1>
+		<h1 class="text-2xl font-bold">{data.event.name} @ {data.event.parlor.name} Settings</h1>
 	</section>
 	<section class="m-4 divide-y rounded-xl border">
 		<a href="settings/member" class="flex flex-row items-center justify-between p-4">

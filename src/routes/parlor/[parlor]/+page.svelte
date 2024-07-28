@@ -30,7 +30,7 @@
 		<div class="flex flex-row items-center justify-between">
 			<h2 class="text-xl font-bold">Events</h2>
 			<a
-				href="{data.parlor.id}/event/create"
+				href="{data.parlor.id}/create_event"
 				class="flex flex-row space-x-2 rounded-lg bg-blue-500 p-4 text-white"
 			>
 				<span class="material-symbols-rounded">add</span> New Event
@@ -38,7 +38,7 @@
 		</div>
 		<div class="divide-y py-4">
 			{#each data.events as event}
-				<a href="{data.parlor.id}/event/{event.id}" class="flex flex-row space-x-4 py-4">
+				<a href="/event/{event.id}" class="flex flex-row space-x-4 py-4">
 					<div class="flex flex-grow flex-col space-y-2">
 						<h2 class="text-xl font-semibold">{event.name}</h2>
 						<p class="text-sm">{event.location}</p>

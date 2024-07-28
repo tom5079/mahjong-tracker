@@ -171,6 +171,7 @@
 				<fieldset class="space-y-2 rounded-lg border border-solid border-gray-300 px-2 pb-2">
 					<legend class="block text-sm font-medium text-gray-900">Uma</legend>
 					<button
+						type="button"
 						on:click={() => {
 							if (uma.type === 'simple') {
 								uma = {
@@ -877,6 +878,16 @@
 							class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
 						/>
 					</label>
+
+					<input
+						type="number"
+						id="suddenDeathPoint"
+						name="suddenDeathPoint"
+						value="40000"
+						step="1000"
+						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+						class:hidden={formDataObject?.suddenDeath !== 'on'}
+					/>
 				</div>
 
 				<div class="flex w-full flex-col space-y-2">

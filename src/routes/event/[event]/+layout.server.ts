@@ -12,6 +12,10 @@ export const load = (async ({ params }) => {
     const event = await prisma.event.findUnique({
         where: {
             id: eventId
+        },
+        include: {
+            ruleset: true,
+            parlor: true
         }
     });
 

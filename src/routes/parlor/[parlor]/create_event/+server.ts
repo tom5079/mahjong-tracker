@@ -32,8 +32,6 @@ export const POST = (async ({ params, request }) => {
         until: joinPolicyUntil
     }
 
-    console.log(joinPolicy)
-
     if (!validateJoinPolicy(joinPolicy)) {
         error(400, 'Invalid join policy')
     }

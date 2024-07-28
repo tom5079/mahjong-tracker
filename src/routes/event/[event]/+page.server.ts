@@ -9,6 +9,9 @@ export const load = (async ({ cookies, params }) => {
     const event = await prisma.event.findUnique({
         where: {
             id: +(params.event ?? NaN)
+        },
+        include: {
+            parlor: true
         }
     })
 
@@ -30,5 +33,5 @@ export const load = (async ({ cookies, params }) => {
         }
     }))
 
-    return { event, joinRequestStatus: joinRequest?.status }
+    return { event, parlor: event.parlor, joinRequestStatus: joinRequest?.status }
 }) satisfies PageServerLoad;

@@ -36,7 +36,7 @@
 				body.set('joinPolicyUntil', moment(joinPolicyUntil).utc().format())
 			}
 
-			const response = await fetch(`create`, {
+			const response = await fetch(`create_event`, {
 				method: 'POST',
 				body
 			})
@@ -44,7 +44,7 @@
 			const json = await response.json()
 
 			if (response.ok) {
-				goto(json.eventId)
+				goto(`/event/${json.eventId}`)
 			} else {
 				error = json.message
 			}
@@ -95,7 +95,7 @@
 			<div>
 				<div class="flex flex-row items-center justify-between py-2">
 					<label for="ruleset" class="mb-2 block text-sm font-medium text-gray-900">Ruleset</label>
-					<a href="../settings/ruleset/create" class="rounded-lg bg-blue-500 px-5 py-2.5 text-white"
+					<a href="settings/ruleset/create" class="rounded-lg bg-blue-500 px-5 py-2.5 text-white"
 						>New Ruleset</a
 					>
 				</div>
@@ -109,7 +109,7 @@
 					{/each}
 				</select>
 			</div>
-			<Fieldset name="Join Policy">
+			<Fieldset label="Join Policy">
 				<Radio
 					name="joinPolicy"
 					values={[
