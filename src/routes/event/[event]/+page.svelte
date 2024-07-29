@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation'
+	import moment from 'moment'
 	import type { PageData } from './$types'
 
 	export let data: PageData
@@ -13,7 +14,7 @@
 <main class="mx-auto max-w-2xl">
 	<section class="p-4">
 		<div class="flex flex-row items-center">
-			<h1 class="mr-auto text-2xl font-bold">{data.event.name} @ {data.parlor.name}</h1>
+			<h1 class="mr-auto text-2xl font-bold">{data.event.name} @ {data.event.parlor.name}</h1>
 			{#if data.joinRequestStatus === 'PENDING'}
 				<p class="flex flex-row items-center p-4 text-sm text-violet-500">
 					<span class="material-symbols-rounded mr-2">hourglass</span>Join request pending
@@ -55,5 +56,26 @@
 				<span class="material-symbols-rounded">add</span> New Game
 			</a>
 		</div>
+		{#each data.event.games as game}
+			<a href="/game/{game.id}" class="my-4 flex flex-row rounded-lg border p-2">
+				<div class="mr-auto">
+					<p class="text-2xl">{game.name}</p>
+					<p class="">Table {game.table}</p>
+					<p class="flex flex-row items-center font-semibold">
+						Scheduled{#if game.startTime}
+							{` at ${new Date(game.startTime).toLocaleString()}`}{/if}
+					</p>
+					<div class="mt-4 flex flex-col">
+						{#each game.players as player, i}
+							<p>
+								<span class="font-mj">{'東南西北'.charAt(i)}</span>
+								{player.user.username}
+							</p>
+						{/each}
+					</div>
+				</div>
+				<span class="material-symbols-rounded my-auto">chevron_right</span>
+			</a>
+		{/each}
 	</section>
 </main>

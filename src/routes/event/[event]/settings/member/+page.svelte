@@ -4,8 +4,6 @@
 
 	export let data: PageData
 
-	console.log(data)
-
 	async function decision(user: string, action: 'accept' | 'reject') {
 		await fetch('member', {
 			method: 'POST',

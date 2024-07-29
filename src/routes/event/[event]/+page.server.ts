@@ -6,16 +6,9 @@ import { getUserToken } from "$lib/server/user";
 import { getUser } from "$lib/server/discord";
 
 export const load = (async ({ cookies, params }) => {
-    const event = await prisma.event.findUnique({
-        where: {
-            id: +(params.event ?? NaN)
-        },
-        include: {
-            parlor: true
-        }
-    })
+    const eventId = +(params.event ?? NaN);
 
-    if (event == null) {
+    if (isNaN(eventId)) {
         error(404, 'Event not found')
     }
 
@@ -28,10 +21,10 @@ export const load = (async ({ cookies, params }) => {
         where: {
             userId_eventId: {
                 userId: user.id,
-                eventId: event.id
+                eventId
             }
         }
     }))
 
-    return { event, parlor: event.parlor, joinRequestStatus: joinRequest?.status }
+    return { joinRequestStatus: joinRequest?.status }
 }) satisfies PageServerLoad;

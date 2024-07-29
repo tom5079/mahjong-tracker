@@ -1,67 +1,26 @@
 <script lang="ts">
 	import Richi from '$lib/Richi.svelte'
 	import Repeat from '$lib/Repeat.svelte'
-	import HistoryEntry from '$lib/record/history-entry.svelte'
-	import PlayerScore from '$lib/record/player-score.svelte'
-	import RonScoring from '$lib/record/ron-scoring.svelte'
-	import TsumoScoring from '$lib/record/tsumo-scoring.svelte'
-	import { convertWind } from '$lib/record/wind'
-	import { KiriageDealer, KiriageNonDealer } from '$lib/record/scoring'
+	import HistoryEntry from '$lib/game/history-entry.svelte'
+	import PlayerScore from '$lib/game/player-score.svelte'
+	import RonScoring from '$lib/game/ron-scoring.svelte'
+	import TsumoScoring from '$lib/game/tsumo-scoring.svelte'
+	import { convertRound } from '$lib/game/wind'
+	import { KiriageDealer, KiriageNonDealer } from '$lib/game/scoring'
+	import { computeState, type State } from '$lib/game/state'
+	import type { PageData } from './$types'
 
-	const state: {
-		round: string
-		richi: number
-		repeat: number
-		players: {
-			id: string
-			score: number
-			wind: string
-			richi: boolean
-		}[]
-		history: {
-			round: string
-			repeat: number
-			result: {
-				player: string
-				wind: string
-				score?: string
-				richi?: boolean
-				chonbo?: boolean
-			}[]
-		}[]
-	} = {
-		round: 'E2',
-		richi: 1,
-		repeat: 0,
-		players: [
-			{ id: 'akadora3', score: 50, wind: 'N', richi: false },
-			{ id: 'tookoo', score: 360, wind: 'E', richi: true },
-			{ id: 'eviltaxi', score: 330, wind: 'S', richi: false },
-			{ id: 'ichigo', score: 250, wind: 'W', richi: false }
-		],
-		history: [
-			{
-				round: 'E1',
-				repeat: 0,
-				result: [
-					{ player: 'akadora3', wind: 'E', score: '-20000' },
-					{ player: 'tookoo', wind: 'S', score: '+12000', richi: true },
-					{ player: 'eviltaxi', wind: 'W', score: '+8000' },
-					{ player: 'ichigo', wind: 'N' }
-				]
-			},
-			{
-				round: 'E1',
-				repeat: 0,
-				result: [
-					{ player: 'akadora3', wind: 'E', chonbo: true },
-					{ player: 'tookoo', wind: 'S' },
-					{ player: 'eviltaxi', wind: 'W' },
-					{ player: 'ichigo', wind: 'N' }
-				]
-			}
-		]
-	}
+	export let data: PageData
+
+	const state: State = computeState({
+		players: data.game.players.map((player) => player.user),
+		ruleset: data.game.event.ruleset,
+		actions: data.game.actions
+	})
+		.onFailure((error) => {
+			console.error(error)
+		})
+		.getOrNull()!
 
 	let action:
 		| {
@@ -86,10 +45,7 @@
 				type: 'chonbo'
 				player: string | null
 		  }
-		| null = {
-		type: 'draw',
-		tenpai: []
-	}
+		| null = null
 
 	let activeWinner: string | null = null
 	let displayArrow: ('U' | 'D' | null)[] = [null, null, null, null, null, null]
@@ -97,12 +53,12 @@
 
 	function displayRon() {
 		const loserIndex = state.players.findIndex(
-			(player) => action?.type === 'ron' && player.id === action.loser
+			(player) => action?.type === 'ron' && player.user.id === action.loser
 		)
 		const winners = state.players.map((player) =>
-			action?.type === 'ron' ? action.scores[player.id] ?? 0 : 0
+			action?.type === 'ron' ? action.scores[player.user.id] ?? 0 : 0
 		)
-		const activeWinnerIndex = state.players.findIndex((player) => player.id === activeWinner)
+		const activeWinnerIndex = state.players.findIndex((player) => player.user.id === activeWinner)
 		displayArrow = [
 			loserIndex === 0 && (winners[1] !== 0 || activeWinnerIndex === 1)
 				? 'U'
@@ -171,11 +127,11 @@
 
 	function displayTsumo() {
 		const winnerIndex = state.players.findIndex(
-			(player) => action?.type === 'tsumo' && player.id === action.winner
+			(player) => action?.type === 'tsumo' && player.user.id === action.winner
 		)
 
 		const pointsLost = state.players.map((player) =>
-			action?.type === 'tsumo' ? action.scores[player.id] ?? 0 : 0
+			action?.type === 'tsumo' ? action.scores[player.user.id] ?? 0 : 0
 		)
 
 		displayArrow = [
@@ -199,7 +155,7 @@
 
 	function displayDraw() {
 		const tenpai = state.players.map(
-			(player) => action?.type === 'draw' && action.tenpai.includes(player.id)
+			(player) => action?.type === 'draw' && action.tenpai.includes(player.user.id)
 		)
 
 		const numTenpai = tenpai.filter((it) => it).length
@@ -345,7 +301,7 @@
 </header>
 <section class="relative mx-auto aspect-square max-w-lg rounded-xl bg-slate-200">
 	<p class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-		<span class="font-mj text-4xl">{convertWind(state.round)}</span>
+		<span class="font-mj text-4xl">{convertRound(state.round)}</span>
 		<Richi count={state.richi} />
 		<Repeat count={state.repeat} />
 	</p>
@@ -455,36 +411,40 @@
 		<p class="absolute left-[10%] top-[10%]">{displayPoint[5]}</p>
 	{/if}
 	<button
-		on:click={() => onPlayerClick(state.players[0].id)}
+		on:click={() => onPlayerClick(state.players[0].user.id)}
 		class="absolute bottom-2 left-1/2 -translate-x-1/2 border-b-4"
-		class:border-gray-500={action?.type === 'draw' && action.tenpai.includes(state.players[0].id)}
-		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[0].id}
+		class:border-gray-500={action?.type === 'draw' &&
+			action.tenpai.includes(state.players[0].user.id)}
+		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[0].user.id}
 	>
-		<PlayerScore player={state.players[0]} />
+		<PlayerScore {...state.players[0]} username={state.players[0].user.username} />
 	</button>
 	<button
-		on:click={() => onPlayerClick(state.players[1].id)}
+		on:click={() => onPlayerClick(state.players[1].user.id)}
 		class="absolute right-2 top-1/2 -translate-y-1/2 border-b-4"
-		class:border-gray-500={action?.type === 'draw' && action.tenpai.includes(state.players[1].id)}
-		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[1].id}
+		class:border-gray-500={action?.type === 'draw' &&
+			action.tenpai.includes(state.players[1].user.id)}
+		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[1].user.id}
 	>
-		<PlayerScore player={state.players[1]} />
+		<PlayerScore {...state.players[1]} username={state.players[1].user.username} />
 	</button>
 	<button
-		on:click={() => onPlayerClick(state.players[2].id)}
+		on:click={() => onPlayerClick(state.players[2].user.id)}
 		class="absolute left-1/2 top-2 -translate-x-1/2 border-b-4"
-		class:border-gray-500={action?.type === 'draw' && action.tenpai.includes(state.players[2].id)}
-		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[2].id}
+		class:border-gray-500={action?.type === 'draw' &&
+			action.tenpai.includes(state.players[2].user.id)}
+		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[2].user.id}
 	>
-		<PlayerScore player={state.players[2]} />
+		<PlayerScore {...state.players[2]} username={state.players[2].user.username} />
 	</button>
 	<button
-		on:click={() => onPlayerClick(state.players[3].id)}
+		on:click={() => onPlayerClick(state.players[3].user.id)}
 		class="absolute left-2 top-1/2 -translate-y-1/2 border-b-4"
-		class:border-gray-500={action?.type === 'draw' && action.tenpai.includes(state.players[3].id)}
-		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[3].id}
+		class:border-gray-500={action?.type === 'draw' &&
+			action.tenpai.includes(state.players[3].user.id)}
+		class:border-yellow-500={action?.type === 'chonbo' && action.player == state.players[3].user.id}
 	>
-		<PlayerScore player={state.players[3]} />
+		<PlayerScore {...state.players[3]} username={state.players[3].user.username} />
 	</button>
 </section>
 {#if action == null}
@@ -510,16 +470,31 @@
 				<div>
 					<div class="flex flex-row items-center justify-between">
 						<p class="my-4 text-2xl">
-							<span class="font-mj">{convertWind(history.round)}</span> /
+							<span class="font-mj">{convertRound(history.round)}</span> /
 							{history.repeat}<span class="font-mj">本場</span>
 						</p>
-						<img src="edit.svg" alt="edit" class="h-6 w-6" />
 					</div>
 					<div class="grid grid-cols-2 gap-2">
-						<HistoryEntry result={history.result[0]} />
-						<HistoryEntry result={history.result[1]} />
-						<HistoryEntry result={history.result[2]} />
-						<HistoryEntry result={history.result[3]} />
+						<HistoryEntry
+							{...history.result[0]}
+							username={state.players.find((player) => player.user.id === history.result[0].player)
+								?.user?.username ?? 'unknown user'}
+						/>
+						<HistoryEntry
+							{...history.result[1]}
+							username={state.players.find((player) => player.user.id === history.result[0].player)
+								?.user?.username ?? 'unknown user'}
+						/>
+						<HistoryEntry
+							{...history.result[2]}
+							username={state.players.find((player) => player.user.id === history.result[0].player)
+								?.user?.username ?? 'unknown user'}
+						/>
+						<HistoryEntry
+							{...history.result[3]}
+							username={state.players.find((player) => player.user.id === history.result[0].player)
+								?.user?.username ?? 'unknown user'}
+						/>
 					</div>
 				</div>
 				<div class="my-4 h-px w-full bg-slate-300" />
@@ -572,7 +547,7 @@
 		{:else}
 			<p class="px-4 text-2xl">Winner: {activeWinner}</p>
 			<RonScoring
-				scores={state.players.find((player) => player.id === activeWinner)?.wind === 'E'
+				scores={state.players.find((player) => player.user.id === activeWinner)?.wind === 0
 					? KiriageDealer
 					: KiriageNonDealer}
 				onScore={(score) => {
@@ -622,8 +597,8 @@
 		{:else}
 			<TsumoScoring
 				scores={state.players.find(
-					(player) => action?.type === 'tsumo' && player.id === action.winner
-				)?.wind === 'E'
+					(player) => action?.type === 'tsumo' && player.user.id === action.winner
+				)?.wind === 0
 					? KiriageDealer
 					: KiriageNonDealer}
 				onScore={(score) => {
@@ -637,11 +612,11 @@
 								if (action?.type !== 'tsumo') {
 									return null
 								}
-								if (player.id === action.winner) {
+								if (player.user.id === action.winner) {
 									return null
 								}
 
-								return [player.id, player.wind === 'E' ? score.fromDealer : score.fromNonDealer]
+								return [player.user.id, player.wind === 0 ? score.fromDealer : score.fromNonDealer]
 							})
 							.filter((it) => it != null)
 					)

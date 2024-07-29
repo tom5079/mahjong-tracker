@@ -6,6 +6,8 @@
 	import Fieldset from '$lib/form/Fieldset.svelte'
 
 	import type { User } from '@prisma/client'
+	import { onMount } from 'svelte'
+	import moment from 'moment'
 
 	export let data: PageData
 
@@ -16,11 +18,63 @@
 	let userSearch = ''
 	let searchResult = []
 
-	$: searchResult = data.attendees.filter((x) =>
-		userSearch ? x.username.includes(userSearch) : true
-	)
+	let dragIndex: number | null = null
+	let targetIndex: number | null = null
 
-	const roster: User[] = Array(10).fill(data.attendees[0])
+	let form: HTMLFormElement
+
+	$: searchResult = data.attendees
+		.filter((x) => (userSearch ? x.username.includes(userSearch) : true))
+		.filter((x) => !roster.includes(x))
+
+	let roster: User[] = []
+
+	function shuffle(array: any[]) {
+		let currentIndex = array.length
+		let temporaryValue
+		let randomIndex
+
+		while (currentIndex !== 0) {
+			randomIndex = Math.floor(Math.random() * currentIndex)
+			currentIndex -= 1
+
+			temporaryValue = array[currentIndex]
+			array[currentIndex] = array[randomIndex]
+			array[randomIndex] = temporaryValue
+		}
+
+		return array
+	}
+
+	onMount(() => {
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault()
+
+			const body = new FormData(form)
+
+			const name = body.get('name')?.toString()
+
+			if (!name) {
+				body.set('name', `Game ${moment().format('YYYY-MM-DD HH:mm')}`)
+			}
+
+			const startTime = body.get('startTime')?.toString()
+
+			if (startTime) {
+				body.set('startTime', moment(startTime).utc().format())
+			}
+
+			body.delete('roster')
+			roster.forEach((player) => {
+				body.append('roster', player.id)
+			})
+
+			const response = await fetch('create_game', {
+				method: 'POST',
+				body
+			})
+		})
+	})
 </script>
 
 <main class="mx-auto max-w-2xl">
@@ -28,17 +82,27 @@
 		<h1 class="text-2xl font-semibold">New Game @ {data.event.name}</h1>
 	</section>
 	<section>
-		<form>
+		<form bind:this={form}>
 			<div class="space-y-8 p-4">
-				<Text name="name" label="Name (optional)" />
+				<Text name="name" label="Name" />
 				<Label label="Start time">
-					<Datetime name="start" />
+					<Datetime name="startTime" />
 				</Label>
 				<div class="flex flex-row items-center text-sm">
 					<span class="mr-auto font-medium">Duration</span>
-					<input type="number" class="mr-2 w-20 rounded-lg border border-gray-300 bg-gray-50 p-2" />
+					<input
+						name="durationHours"
+						min="0"
+						type="number"
+						class="mr-2 w-20 rounded-lg border border-gray-300 bg-gray-50 p-2"
+					/>
 					<span class="mr-4 font-medium">h</span>
-					<input type="number" class="mr-2 w-20 rounded-lg border border-gray-300 bg-gray-50 p-2" />
+					<input
+						name="durationMinutes"
+						min="0"
+						type="number"
+						class="mr-2 w-20 rounded-lg border border-gray-300 bg-gray-50 p-2"
+					/>
 					<span class="font-medium">min</span>
 				</div>
 				<Fieldset label="Roster">
@@ -50,6 +114,7 @@
 							class="peer w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 						/>
 						<button
+							on:click={() => (roster = shuffle(roster))}
 							type="button"
 							class="material-symbols-rounded ml-auto flex flex-row items-center rounded-lg bg-blue-500 p-2 text-white"
 						>
@@ -60,41 +125,68 @@
 						>
 							{#if searchResult.length > 0}
 								{#each searchResult as user}
-									<div class="flex flex-row items-center space-x-2">
+									<button
+										on:mousedown={() => (roster = [...roster, user])}
+										class="flex flex-row items-center space-x-2 py-4"
+									>
 										<img
 											src="https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.webp"
 											alt="avatar of {user.username}"
 											class="h-8 w-8 rounded-full"
 										/>
 										<p>{user.username}</p>
-									</div>
+									</button>
 								{/each}
 							{:else}
 								<p>No result</p>
 							{/if}
 						</div>
 					</div>
-					<div class="flex flex-col">
+					<ol class="flex flex-col">
 						{#each roster as player, i}
-							<div
+							<li
+								on:dragstart={() => (dragIndex = i)}
+								on:dragover={() => (targetIndex = i)}
+								on:dragend={() => {
+									if (dragIndex !== null && targetIndex !== null) {
+										const temp = roster[dragIndex]
+										roster[dragIndex] = roster[targetIndex]
+										roster[targetIndex] = temp
+									}
+
+									dragIndex = null
+									targetIndex = null
+								}}
 								class="flex flex-row items-center space-x-4 border-gray-300 px-4 py-2"
+								class:bg-gray-300={dragIndex === i}
 								class:border-t={i !== 0 && i % numPlayers === 0}
+								draggable="true"
 							>
+								<span class="material-symbols-rounded cursor-pointer select-none"
+									>drag_indicator</span
+								>
 								<img
 									src="https://cdn.discordapp.com/avatars/{player.id}/{player.avatar}.webp"
 									alt="avatar of {player.username}"
 									class="h-8 w-8 rounded-full"
 								/>
 								<p class="flex-1">{player.username}</p>
-								{#if Math.floor((roster.length - 1) / numPlayers) * numPlayers > i}
+								{#if Math.floor(roster.length / numPlayers) * numPlayers > i}
 									<p class="text-sm"># {Math.floor(i / numPlayers) + 1}</p>
 									<p class="font-mj text-2xl">{'東南西北'.charAt(i % numPlayers)}</p>
 								{:else}
 									<p class="pr-8">-</p>
 								{/if}
-							</div>
+								<button
+									on:click={() => {
+										roster.splice(i, 1)
+										roster = roster
+									}}
+									class="material-symbols-rounded">clear</button
+								>
+							</li>
 						{/each}
-					</div>
+					</ol>
 				</Fieldset>
 				<div class="flex flex-row pt-4">
 					<p class="ml-auto text-red-500">{error}</p>

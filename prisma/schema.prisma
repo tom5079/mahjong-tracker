@@ -23,6 +23,7 @@ model User {
   avatar          String?
   username        String
   attendedEvents  EventAttendee[]
+  games           GamePlayer[]
 }
 
 model Parlor {
@@ -70,13 +71,24 @@ model EventAttendee {
 
 model Game {
   id              Int      @id @default(autoincrement())
-  eventId         Int
-  startTime       DateTime
+  name            String
+  table           Int
+  startTime       DateTime?
   durationSeconds Int
-  users           String[]
+  players         GamePlayer[]
   /// [Actions]
   actions         Json
   event           Event    @relation(fields: [eventId], references: [id])
+  eventId         Int
+}
+
+model GamePlayer {
+  gameId  Int
+  userId  String
+  user    User    @relation(fields: [userId], references: [id])
+  game    Game    @relation(fields: [gameId], references: [id])
+  index   Int
+  @@id([gameId, userId])
 }
 
 model Ruleset {
