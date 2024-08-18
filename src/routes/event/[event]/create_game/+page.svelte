@@ -94,6 +94,13 @@
 			method: 'POST',
 			body
 		})
+
+		if (response.ok) {
+			window.history.back()
+		} else {
+			const body = await response.json()
+			error = body.message
+		}
 	}
 </script>
 
