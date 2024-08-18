@@ -65,14 +65,26 @@ declare global {
 			type: 'nagashi'
 			players: string[]
 		} | {
+			type: 'oyaNagashi'
+		} | {
 			type: 'chonbo'
 			player: string
 		} | {
 			type: 'riichi',
 			player: string
+		} | {
+			type: 'start',
+			at: string
+		} | {
+			type: 'pause',
+			at: string
+		} | {
+			type: 'resume',
+			at: string
+		} | {
+			type: 'end',
+			at: string
 		}
 		type Actions = Action[]
 	}
 }
-
-export { };

@@ -1,4 +1,4 @@
-import moment from "moment"
+import { DateTime } from "luxon"
 import type { ScoringSheet } from "./scoring"
 
 export function validateUma(uma: any): uma is PrismaJson.Uma {
@@ -45,7 +45,24 @@ export function validateJoinPolicy(joinPolicy: any): joinPolicy is PrismaJson.Ev
         (joinPolicy.type === 'manual' ||
             (joinPolicy.type === 'auto' &&
                 (joinPolicy.until == null ||
-                    (moment(joinPolicy.until).isValid() &&
-                        moment(joinPolicy.until).utcOffset() === 0 &&
-                        moment(joinPolicy.until) > moment()))))
+                    (DateTime.fromISO(joinPolicy.until).isValid &&
+                        DateTime.fromISO(joinPolicy.until).toUnixInteger() === 0 &&
+                        DateTime.fromISO(joinPolicy.until) > DateTime.now()))))
+}
+
+export function validateAction(action: any): action is PrismaJson.Action {
+    return action != null &&
+        typeof action === 'object' &&
+        typeof action.type === 'string' &&
+        ((action.type === 'riichi' && typeof action.player === 'string') ||
+            (action.type === 'chonbo' && typeof action.player === 'string') ||
+            (action.type === 'draw' && Array.isArray(action.tenpai) && action.tenpai.every((x: any) => typeof x === 'string')) ||
+            (action.type === 'nagashi' && Array.isArray(action.players) && action.players.every((x: any) => typeof x === 'string')) ||
+            (action.type === 'oyaNagashi') ||
+            (action.type === 'ron' && typeof action.loser === 'string' && typeof action.scores === 'object' && Object.entries(action.scores).every(([k, v]) => typeof k === 'string' && typeof v === 'number')) ||
+            (action.type === 'tsumo' && typeof action.winner === 'string' && typeof action.scores === 'object' && Object.entries(action.scores).every(([k, v]) => typeof k === 'string' && typeof v === 'number')) ||
+            (action.type === 'start' && typeof action.at === 'string' && DateTime.fromISO(action.at).isValid) ||
+            (action.type === 'resume' && typeof action.at === 'string' && DateTime.fromISO(action.at).isValid) ||
+            (action.type === 'pause' && typeof action.at === 'string' && DateTime.fromISO(action.at).isValid)) ||
+        (action.type === 'end' && typeof action.at === 'string' && DateTime.fromISO(action.at).isValid)
 }

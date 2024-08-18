@@ -23,7 +23,7 @@
 	]
 </script>
 
-<main class="p-4">
+<main class="mx-auto max-w-2xl p-4">
 	<section class="mb-4 pl-2">
 		<h1 class="text-2xl font-bold">{data.parlor.name} Settings</h1>
 	</section>

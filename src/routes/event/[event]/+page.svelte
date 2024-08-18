@@ -1,9 +1,38 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation'
-	import moment from 'moment'
+	import { computeState } from '$lib/game/state'
+	import { convertRound } from '$lib/game/wind'
 	import type { PageData } from './$types'
+	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 
 	export let data: PageData
+
+	$: players = data.games.flatMap((game) => game.players.map((player) => player.user))
+
+	$: states = data.games.map((game) => ({
+		game,
+		state: computeState({
+			players: game.players.map((player) => player.user),
+			ruleset: data.event.ruleset,
+			actions: game.actions
+		})
+	}))
+
+	$: currentPage = +($page.url.searchParams.get('page') ?? 1)
+
+	$: leaderboard = Object.entries(
+		states.reduce<Record<string, number>>((acc, { state }) => {
+			if (!state.ok) return acc
+			const match = state.value.match
+			if (match.state !== 'ENDED') return acc
+			match.result.forEach((player) => {
+				if (!acc[player.player]) acc[player.player] = 0
+				acc[player.player] += player.soten - player.penalty
+			})
+			return acc
+		}, {})
+	).sort((a, b) => b[1] - a[1])
 
 	async function join() {
 		await fetch(`${data.event.id}/join`, { method: 'POST' })
@@ -42,8 +71,26 @@
 		</div>
 	</section>
 	<section class="p-4">
-		<div class="flex flex-row items-center justify-between">
+		<div class="flex flex-col space-y-4">
 			<h2 class="text-xl font-semibold">Leaderboard</h2>
+			<div class="grid grid-cols-3 rounded-lg border">
+				<th class="p-4 text-right text-lg">Position</th>
+				<th class="p-4 text-right text-lg">Player</th>
+				<th class="p-4 text-right text-lg">Score</th>
+				{#each leaderboard as [player, score], i}
+					{@const playerUser = players.find((p) => p.id === player)}
+					<td class="p-4 text-right text-lg">{i + 1}</td>
+					<td class="flex items-center justify-end p-4 text-lg">
+						<img
+							src="https://cdn.discordapp.com/avatars/{playerUser?.id}/{playerUser?.avatar}.webp"
+							alt="avatar of {playerUser?.username}"
+							class="h-8 w-8 rounded-full border"
+						/>
+						{playerUser?.username}
+					</td>
+					<td class="p-4 text-right text-lg">{score}</td>
+				{/each}
+			</div>
 		</div>
 	</section>
 	<section class="p-4">
@@ -56,26 +103,125 @@
 				<span class="material-symbols-rounded">add</span> New Game
 			</a>
 		</div>
-		{#each data.event.games as game}
+		<div class="mx-auto w-fit divide-x overflow-clip rounded-lg border">
+			{#each { length: Math.ceil(data.games.length / 10) } as _, page}
+				<button
+					on:click={() => goto(`?page=${page + 1}`)}
+					class="px-6 py-4 text-lg"
+					class:bg-blue-500={currentPage === page + 1}
+					class:text-white={currentPage === page + 1}
+				>
+					{page + 1}
+				</button>
+			{/each}
+		</div>
+		{#each states.slice((currentPage - 1) * 10, currentPage * 10) as { game, state }}
 			<a href="/game/{game.id}" class="my-4 flex flex-row rounded-lg border p-2">
-				<div class="mr-auto">
+				<div class="flex-1">
 					<p class="text-2xl">{game.name}</p>
 					<p class="">Table {game.table}</p>
 					<p class="flex flex-row items-center font-semibold">
-						Scheduled{#if game.startTime}
-							{` at ${new Date(game.startTime).toLocaleString()}`}{/if}
+						{#if state.ok}
+							{@const match = state.value.match}
+							{#if match.state === 'WAITING'}
+								Scheduled{#if game.startTime}
+									{` at ${new Date(game.startTime).toLocaleString()}`}
+								{/if}
+							{:else if match.state === 'ENDED'}
+								Ended
+							{:else}
+								<span class="relative mr-2 flex h-3 w-3">
+									<span
+										class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+									></span>
+									<span class="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+								</span>
+								Running
+								<span class="ml-2 font-mj">{convertRound(state.value.round)} </span>
+							{/if}
+						{:else}
+							<span class="text-red-500">Error</span>
+						{/if}
 					</p>
-					<div class="mt-4 flex flex-col">
-						{#each game.players as player, i}
-							<p>
-								<span class="font-mj">{'東南西北'.charAt(i)}</span>
-								{player.user.username}
-							</p>
-						{/each}
-					</div>
+
+					{#if state.ok}
+						<table class="mt-4 table-auto">
+							<tbody>
+								{#each state.value.players.sort((a, b) => {
+									const match = state.value.match
+									if (match.state === 'ENDED') {
+										const scores = match.result.map( (it) => ({ ...it, score: it.soten - it.penalty }) )
+
+										const aScore = scores.find((it) => it.player === a.user.id)?.score ?? 0
+										const bScore = scores.find((it) => it.player === b.user.id)?.score ?? 0
+
+										return bScore - aScore
+									}
+									return b.score - a.score
+								}) as player}
+									<tr class="text-lg">
+										<td class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</td>
+										<td class="pr-8">
+											{player.user.username}
+										</td>
+										{#if state.value.match.state === 'ENDED'}
+											{@const score = state.value.match.result.find(
+												(p) => p.player === player.user.id
+											)}
+											{#if score == null}
+												<td class="text-red-500">Error</td>
+											{:else}
+												{@const finalScore = score.soten - score.penalty}
+												<td
+													class="relative"
+													class:text-blue-500={finalScore > 0}
+													class:text-red-500={finalScore < 0}
+												>
+													{#if finalScore < 0}<span class="absolute -left-2">-</span>{/if}
+													<span>
+														{Math.abs(finalScore)}
+													</span>
+												</td>
+											{/if}
+										{:else if state.value.match.state !== 'WAITING'}
+											{@const score = state.value.players.find(
+												(p) => p.user.id === player.user.id
+											)?.score}
+											{#if score == null}
+												<td class="text-red-500">Error</td>
+											{:else}
+												<td
+													class="relative"
+													class:text-blue-500={score > data.event.ruleset.startScore}
+													class:text-red-500={score < data.event.ruleset.startScore}
+												>
+													{#if score < 0}<span class="absolute -left-2">-</span>{/if}
+													<span>
+														{Math.abs(score)}
+													</span>
+												</td>
+											{/if}
+										{/if}
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					{/if}
 				</div>
 				<span class="material-symbols-rounded my-auto">chevron_right</span>
 			</a>
 		{/each}
 	</section>
+	<div class="mx-auto mb-4 w-fit divide-x overflow-clip rounded-lg border">
+		{#each { length: Math.ceil(data.games.length / 10) } as _, page}
+			<button
+				on:click={() => goto(`?page=${page + 1}`)}
+				class="px-6 py-4 text-lg"
+				class:bg-blue-500={currentPage === page + 1}
+				class:text-white={currentPage === page + 1}
+			>
+				{page + 1}
+			</button>
+		{/each}
+	</div>
 </main>

@@ -19,7 +19,7 @@
 	>
 	{#if score}
 		<span class:text-red-700={score < 0} class:text-blue-700={score > 0}
-			>{`${score > 0 ? '+' : '-'}${score}`}</span
+			>{#if score > 0}+{/if}{score}</span
 		>
 	{/if}
 </p>

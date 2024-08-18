@@ -22,6 +22,9 @@ export const load = (async ({ params }) => {
             players: {
                 include: {
                     user: true
+                },
+                orderBy: {
+                    index: 'asc'
                 }
             }
         }

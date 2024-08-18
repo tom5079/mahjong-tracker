@@ -7,7 +7,7 @@
 
 	import type { User } from '@prisma/client'
 	import { onMount } from 'svelte'
-	import moment from 'moment'
+	import { DateTime } from 'luxon'
 
 	export let data: PageData
 
@@ -55,14 +55,26 @@
 			const name = body.get('name')?.toString()
 
 			if (!name) {
-				body.set('name', `Game ${moment().format('YYYY-MM-DD HH:mm')}`)
+				body.set('name', `Game ${DateTime.now().toFormat('YYYY-MM-DD HH:mm')}`)
 			}
 
-			const startTime = body.get('startTime')?.toString()
+			const startTime = DateTime.fromISO(body.get('startTime')?.toString() ?? '')
 
-			if (startTime) {
-				body.set('startTime', moment(startTime).utc().format())
+			if (startTime.isValid) {
+				body.set('startTime', startTime.toISO())
 			}
+
+			const durationHours = +(body.get('durationHours')?.toString() ?? '0')
+			const durationMinutes = +(body.get('durationMinutes')?.toString() ?? '0')
+
+			if (isNaN(durationHours) || isNaN(durationMinutes)) {
+				error = 'Invalid duration'
+				return
+			}
+
+			body.delete('durationHours')
+			body.delete('durationMinutes')
+			body.set('durationSeconds', (durationHours * 3600 + durationMinutes * 60).toString())
 
 			body.delete('roster')
 			roster.forEach((player) => {
@@ -86,7 +98,7 @@
 			<div class="space-y-8 p-4">
 				<Text name="name" label="Name" />
 				<Label label="Start time">
-					<Datetime name="startTime" />
+					<Datetime name="startTime" min={DateTime.now().toISO().slice(0, 16)} />
 				</Label>
 				<div class="flex flex-row items-center text-sm">
 					<span class="mr-auto font-medium">Duration</span>

@@ -6,7 +6,7 @@
 	import Radio from '$lib/form/Radio.svelte'
 	import Label from '$lib/form/Label.svelte'
 	import Datetime from '$lib/form/Datetime.svelte'
-	import moment from 'moment'
+	import { DateTime } from 'luxon'
 
 	export let data: PageData
 
@@ -30,10 +30,10 @@
 
 			const body = new FormData(form)
 
-			const joinPolicyUntil = body.get('joinPolicyUntil')?.toString()
+			const joinPolicyUntil = DateTime.fromISO(body.get('joinPolicyUntil')?.toString() ?? '')
 
-			if (joinPolicyUntil) {
-				body.set('joinPolicyUntil', moment(joinPolicyUntil).utc().format())
+			if (joinPolicyUntil.isValid) {
+				body.set('joinPolicyUntil', joinPolicyUntil.toISO())
 			}
 
 			const response = await fetch(`create_event`, {
@@ -126,7 +126,7 @@
 				/>
 				<div class="p-2" class:hidden={formData?.joinPolicy?.toString() !== 'auto'}>
 					<Label label="Until">
-						<Datetime name="joinPolicyUntil" min={moment().format().slice(0, 16)} />
+						<Datetime name="joinPolicyUntil" min={DateTime.now().toISO().slice(0, 16)} />
 					</Label>
 				</div>
 			</Fieldset>

@@ -41,17 +41,17 @@
 				<a href="/event/{event.id}" class="flex flex-row space-x-4 py-4">
 					<div class="flex flex-grow flex-col space-y-2">
 						<h2 class="text-xl font-semibold">{event.name}</h2>
-						<p class="text-sm">{event.location}</p>
+						{#if event.location}
+							<p class="flex flex-row items-center text-sm">
+								<span class="material-symbols-rounded mr-1 text-lg">location_on</span>
+								{event.location}
+							</p>
+						{/if}
 						<p class="text-sm">{event.description}</p>
 					</div>
 					<span class="material-symbols-rounded my-auto">chevron_right</span>
 				</a>
 			{/each}
-		</div>
-	</section>
-	<section>
-		<div class="flex flex-row items-center justify-between">
-			<h2 class="text-xl font-bold">Leaderboard</h2>
 		</div>
 	</section>
 </main>

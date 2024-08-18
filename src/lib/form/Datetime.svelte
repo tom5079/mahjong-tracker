@@ -1,11 +1,12 @@
 <script lang="ts">
-	import moment from 'moment-timezone'
+	import { DateTime } from 'luxon'
+
 	export let name: string
 
 	export let min: string | undefined = undefined
 	export let required: boolean | undefined = undefined
 
-	const timezone = moment.tz(moment.tz.guess()).format('z')
+	const timezone = DateTime.local().zone.offsetName(0, { format: 'short' })
 </script>
 
 <div class="flex flex-col items-start">

@@ -15,19 +15,7 @@ export const load = (async ({ params }) => {
         },
         include: {
             ruleset: true,
-            parlor: true,
-            games: {
-                include: {
-                    players: {
-                        include: {
-                            user: true
-                        },
-                        orderBy: {
-                            index: 'asc'
-                        }
-                    }
-                }
-            }
+            parlor: true
         }
     });
 
