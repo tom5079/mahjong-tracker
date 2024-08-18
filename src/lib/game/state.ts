@@ -1,5 +1,5 @@
 import { wrapCatching } from "$lib/result"
-import type { Game, Ruleset, User } from "@prisma/client"
+import type { Ruleset, User } from "@prisma/client"
 import { DateTime, Duration } from "luxon"
 
 export type State = {
