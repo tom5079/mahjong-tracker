@@ -2,8 +2,7 @@ import prisma from "$lib/server/prisma";
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { getSessionId } from "$lib/server/session";
-import { getUserToken } from "$lib/server/user";
-import { getUser } from "$lib/server/discord";
+import { getUser } from "$lib/server/user";
 
 export const load = (async ({ cookies, params, url }) => {
     const eventId = +(params.event ?? NaN);
@@ -13,9 +12,8 @@ export const load = (async ({ cookies, params, url }) => {
     }
 
     const sessionId = getSessionId(cookies);
-    const userToken = await getUserToken(sessionId);
 
-    const user = userToken != null ? await getUser(userToken) : null;
+    const user = await getUser(sessionId);
 
     const joinRequest = user && (await prisma.eventAttendee.findUnique({
         where: {

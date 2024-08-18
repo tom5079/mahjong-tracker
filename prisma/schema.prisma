@@ -13,6 +13,8 @@ datasource db {
 
 model UserToken {
   sessionId    String   @id
+  userId       String   
+  user         User     @relation(fields: [userId], references: [id])
   accessToken  String
   refreshToken String
   expiresAt    DateTime
@@ -22,6 +24,7 @@ model User {
   id              String  @id
   avatar          String?
   username        String
+  token           UserToken[]
   attendedEvents  EventAttendee[]
   games           GamePlayer[]
 }

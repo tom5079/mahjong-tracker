@@ -1,28 +1,9 @@
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "$env/static/private"
 
-export type User = {
-    id: string,
-    username: string,
-    discriminator: string,
-    global_name: string | null,
-    avatar: string | null,
-}
-
 export type TokenPackage = {
     accessToken: string,
     expiresAt: Date,
     refreshToken: string
-}
-
-export function getUser(accessToken: string, userId: string = '@me'): Promise<User> {
-    return fetch(
-        `https://discord.com/api/users/${userId}`,
-        {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        }
-    ).then((res) => res.json())
 }
 
 export async function exchangeToken(code: string): Promise<TokenPackage> {

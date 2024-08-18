@@ -1,8 +1,7 @@
 import { CAPTCHA_SERVER_KEY } from "$env/static/private";
-import { getUser } from "$lib/server/discord";
 import { registerParlor } from "$lib/server/parlor";
 import { getSessionId } from "$lib/server/session";
-import { getUserToken } from "$lib/server/user";
+import { getUser } from "$lib/server/user";
 import { error, json } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 
@@ -31,8 +30,8 @@ export const POST = (async ({ cookies, request }) => {
     }
 
     const sessionId = getSessionId(cookies)
-    const userToken = await getUserToken(sessionId)
-    if (!userToken) {
+    const owner = await getUser(sessionId)
+    if (!owner) {
         error(401, 'Unauthorized')
     }
 
@@ -42,7 +41,6 @@ export const POST = (async ({ cookies, request }) => {
         error(400, 'Name must be at least 3 characters long')
     }
 
-    const owner = await getUser(userToken)
 
     const parlor = await registerParlor({
         name: name!,

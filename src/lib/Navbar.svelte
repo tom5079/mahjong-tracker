@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { User } from './server/discord'
+	import type { User } from '@prisma/client'
 	import { fade } from 'svelte/transition'
 
 	export let user: User | null = null

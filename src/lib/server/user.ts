@@ -1,4 +1,5 @@
-import { getUser as getUserByToken, refreshToken } from "./discord";
+import type { User } from "@prisma/client";
+import { refreshToken } from "./discord";
 import prisma from "./prisma";
 
 function registerUser({
@@ -17,6 +18,13 @@ function registerUser({
     })
 }
 
+export async function getUser(sessionId: string): Promise<User | null> {
+    return (await prisma.userToken.findUnique({
+        where: { sessionId },
+        include: { user: true }
+    }))?.user ?? null
+}
+
 export async function getUserById(userId: string) {
     return prisma.user.findUnique({ where: { id: userId } })
 }
@@ -32,7 +40,14 @@ export async function registerUserToken({
     refreshToken: string
     expiresAt: Date
 }) {
-    const user = await getUserByToken(accessToken)
+    const user = await fetch(
+        `https://discord.com/api/users/@me`,
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        }
+    ).then((res) => res.json())
 
     await registerUser({
         id: user.id,
@@ -43,11 +58,13 @@ export async function registerUserToken({
     return prisma.userToken.upsert({
         where: { sessionId },
         update: {
+            userId: user.id,
             accessToken,
             refreshToken,
             expiresAt
         },
         create: {
+            userId: user.id,
             sessionId,
             accessToken,
             refreshToken,

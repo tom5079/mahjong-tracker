@@ -1,5 +1,4 @@
-import { getUser } from "$lib/server/discord";
-import { getUserToken } from "$lib/server/user";
+import { getUser } from "$lib/server/user";
 import type { LayoutServerLoad } from "./$types";
 
 export const load = (async ({ cookies }) => {
@@ -11,9 +10,7 @@ export const load = (async ({ cookies }) => {
         }
     }
 
-    const accessToken = await getUserToken(sessionId)
-
     return {
-        user: accessToken != null ? await getUser(accessToken) : null
+        user: await getUser(sessionId)
     }
 }) satisfies LayoutServerLoad;
