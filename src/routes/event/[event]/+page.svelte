@@ -102,7 +102,7 @@
 							<UserAvatar user={playerUser} />
 							<span class="ml-4">{playerUser?.username}</span>
 						</td>
-						<td class="p-4 text-right text-lg">{score}</td>
+						<td class="p-4 text-right text-lg">{score / 10}</td>
 					{/if}
 				{/each}
 			</div>
@@ -194,7 +194,7 @@
 												>
 													{#if finalScore < 0}<span class="absolute -left-2">-</span>{/if}
 													<span>
-														{Math.abs(finalScore)}
+														{Math.abs(finalScore) / 10}
 													</span>
 												</td>
 											{/if}

@@ -64,7 +64,7 @@
 		const name = body.get('name')?.toString()
 
 		if (!name) {
-			body.set('name', `Game ${DateTime.now().toFormat('YYYY-MM-DD HH:mm')}`)
+			body.set('name', `Game ${DateTime.now().toLocaleString(DateTime.DATETIME_SHORT)}`)
 		}
 
 		const startTime = DateTime.fromISO(body.get('startTime')?.toString() ?? '')
