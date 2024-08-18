@@ -50,6 +50,16 @@ export const POST = (async ({ params, request }) => {
                 }
             })
             break
+        case 'remove':
+            await prisma.eventAttendee.delete({
+                where: {
+                    userId_eventId: {
+                        userId,
+                        eventId
+                    }
+                }
+            })
+            break
         default:
             error(400, 'Invalid action')
     }

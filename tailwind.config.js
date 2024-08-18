@@ -6,6 +6,9 @@ export default {
 			fontFamily: {
 				sans: ['Montserrat'],
 				mj: ['"LXGW WenKai Mono TC"']
+			},
+			gridTemplateColumns: {
+				leaderboard: 'auto minmax(0, 1fr) auto'
 			}
 		}
 	},

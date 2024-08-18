@@ -1,4 +1,4 @@
-<main>
+<main class="mx-auto max-w-2xl">
 	<section class="mx-auto flex flex-row flex-wrap">
 		<div class="mx-auto flex py-16">
 			<div
@@ -16,5 +16,9 @@
 			<p class="py-2 text-2xl font-extrabold tracking-tight">Mahjong Tracker</p>
 			<p>Track your mahjong games with ease</p>
 		</div>
+		<a href="/parlor" class="mx-auto mt-16 flex flex-row rounded-lg bg-sky-500 p-4 text-white">
+			Explore Parlors
+			<span class="material-symbols-rounded ml-2">trending_flat</span>
+		</a>
 	</section>
 </main>

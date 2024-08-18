@@ -7,6 +7,7 @@
 	import { page } from '$app/stores'
 	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 	import { onMount } from 'svelte'
+	import UserAvatar from '$lib/UserAvatar.svelte'
 
 	export let data: PageData
 
@@ -50,9 +51,9 @@
 				.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
 				.then(async (token) => {
 					await fetch(`${data.event.id}/join`, { method: 'POST', body: token })
+					invalidateAll()
 				})
 		})
-		invalidateAll()
 	}
 </script>
 
@@ -89,20 +90,16 @@
 	<section class="p-4">
 		<div class="flex flex-col space-y-4">
 			<h2 class="text-xl font-semibold">Leaderboard</h2>
-			<div class="grid grid-cols-3 rounded-lg border">
+			<div class="grid-cols-leaderboard grid rounded-lg border">
 				<th class="p-4 text-right text-lg">Position</th>
 				<th class="p-4 text-right text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
 				{#each leaderboard as [player, score], i}
 					{@const playerUser = data.attendees.find((p) => p.user.id === player)?.user}
 					<td class="p-4 text-right text-lg">{i + 1}</td>
-					<td class="flex items-center justify-end p-4 text-lg">
-						<img
-							src="https://cdn.discordapp.com/avatars/{playerUser?.id}/{playerUser?.avatar}.webp"
-							alt="avatar of {playerUser?.username}"
-							class="h-8 w-8 rounded-full border"
-						/>
-						{playerUser?.username}
+					<td class="flex flex-row items-center justify-end p-4 text-lg">
+						<UserAvatar user={playerUser} />
+						<span class="ml-4">{playerUser?.username}</span>
 					</td>
 					<td class="p-4 text-right text-lg">{score}</td>
 				{/each}
