@@ -92,12 +92,12 @@
 			<h2 class="text-xl font-semibold">Leaderboard</h2>
 			<div class="grid-cols-leaderboard grid rounded-lg border">
 				<th class="p-4 text-right text-lg">Position</th>
-				<th class="p-4 text-right text-lg">Player</th>
+				<th class="p-4 text-left text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
 				{#each leaderboard as [player, score], i}
 					{@const playerUser = data.attendees.find((p) => p.user.id === player)?.user}
 					<td class="p-4 text-right text-lg">{i + 1}</td>
-					<td class="flex flex-row items-center justify-end p-4 text-lg">
+					<td class="flex flex-row items-center p-4 text-lg">
 						<UserAvatar user={playerUser} />
 						<span class="ml-4">{playerUser?.username}</span>
 					</td>
