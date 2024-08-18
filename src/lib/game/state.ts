@@ -608,10 +608,10 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 endedAt: DateTime.now(),
                 result: state.players.toSorted((a, b) => b.score - a.score).map((player, i) => ({
                     player: player.user.id,
-                    soten: (player.score
+                    soten: Math.round(((player.score
                         - ruleset.returnScore
                         + (i === 0 ? (ruleset.player === 'FOUR' ? 4 : 3) * (ruleset.returnScore - ruleset.startScore) : 0)
-                    ) / 1000 + uma[i],
+                    ) / 1000 + uma[i]) * 10) / 10,
                     penalty: player.penalty
                 }))
             }
