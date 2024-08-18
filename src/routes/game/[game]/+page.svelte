@@ -6,7 +6,6 @@
 	import RonScoring from '$lib/game/ron-scoring.svelte'
 	import TsumoScoring from '$lib/game/tsumo-scoring.svelte'
 	import { convertRound } from '$lib/game/wind'
-	import { KiriageDealer, KiriageNonDealer } from '$lib/game/scoring'
 	import {
 		calculateRonPayment,
 		calculateTsumoPayment,
@@ -851,8 +850,8 @@
 						<RonScoring
 							scores={state.players.find((player) => player.user.id === activeWinner?.id)?.wind ===
 							0
-								? KiriageDealer
-								: KiriageNonDealer}
+								? data.game.event.ruleset.scores.dealer
+								: data.game.event.ruleset.scores.nonDealer}
 							onScore={(score) => {
 								if (action?.type !== 'ron' || activeWinner == null) {
 									throw new Error('Inconsistent action')
@@ -902,8 +901,8 @@
 							scores={state.players.find(
 								(player) => action?.type === 'tsumo' && player.user.id === action.winner?.id
 							)?.wind === 0
-								? KiriageDealer
-								: KiriageNonDealer}
+								? data.game.event.ruleset.scores.dealer
+								: data.game.event.ruleset.scores.nonDealer}
 							onScore={(score) => {
 								if (action?.type !== 'tsumo') {
 									return

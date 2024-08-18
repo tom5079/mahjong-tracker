@@ -1,28 +1,23 @@
 <script lang="ts">
-	import type { Scoring } from './scoring'
-	export let scores: Scoring
+	export let scores: PrismaJson.Scores['dealer']
 	export let onScore: (score: number) => void
-	let han: number | null = null
+
+	let category = [scores.ron]
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4">
-	{#if han == null}
-		{#each { length: 4 } as _, i}
-			<button on:click={() => (han = i + 1)} class="rounded border p-8 text-xl font-bold"
-				>{i + 1} Han</button
-			>
-		{/each}
-		{#each Object.entries(scores.specialRon) as [name, score]}
+	{#each category[0] as [name, score]}
+		{#if typeof score === 'number'}
 			<button on:click={() => onScore(score)} class="rounded border p-8 text-xl font-bold"
 				>{name}</button
 			>
-		{/each}
-	{:else}
-		{#each [20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 110] as fu}
+		{:else if Array.isArray(score)}
 			<button
-				on:click={() => han && onScore(scores.ron(han, fu))}
-				class="rounded border p-8 text-xl font-bold">{fu} Fu</button
+				on:click={() => {
+					category = [score, ...category]
+				}}
+				class="rounded border p-8 text-xl font-bold">{name}</button
 			>
-		{/each}
-	{/if}
+		{/if}
+	{/each}
 </div>
