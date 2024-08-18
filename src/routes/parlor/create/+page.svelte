@@ -19,9 +19,7 @@
 	onMount(() => {
 		form.addEventListener('submit', (event) => {
 			event.preventDefault()
-			// @ts-ignore
 			window.grecaptcha.ready(() => {
-				// @ts-ignore
 				window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' }).then(onSubmit)
 			})
 		})

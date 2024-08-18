@@ -1,11 +1,16 @@
 import { getSessionId } from "$lib/server/session";
-import { getUserToken } from "$lib/server/user";
-import { error } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
-import { getUser } from "$lib/server/discord";
+import { getUser } from "$lib/server/user";
+import { error, type RequestHandler } from "@sveltejs/kit";
 import prisma from "$lib/server/prisma";
+import { validateCaptcha } from "$lib/server/captcha";
 
-export const POST = (async ({ cookies, params }) => {
+export const POST = (async ({ cookies, params, request }) => {
+    const cpatchaToken = await request.text()
+
+    if (!validateCaptcha(cpatchaToken)) {
+        error(400, 'Invalid captcha token')
+    }
+
     const eventID = +(params.event ?? NaN)
 
     if (isNaN(eventID)) {
@@ -13,13 +18,7 @@ export const POST = (async ({ cookies, params }) => {
     }
 
     const sessionId = getSessionId(cookies);
-    const userToken = await getUserToken(sessionId);
-
-    if (userToken == null) {
-        error(401, 'Unauthorized');
-    }
-
-    const user = await getUser(userToken);
+    const user = await getUser(sessionId);
 
     if (user == null) {
         error(401, 'Unauthorized');
@@ -61,4 +60,4 @@ export const POST = (async ({ cookies, params }) => {
     })
 
     return new Response()
-}) satisfies RequestHandler;
+}) satisfies RequestHandler

@@ -1,21 +1,31 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation'
 	import type { PageData } from './$types'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
 	export let data: PageData
 
-	async function decision(user: string, action: 'accept' | 'reject') {
+	async function onSubmitDecision(token: string, user: string, action: 'accept' | 'reject') {
 		await fetch('member', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
+				token,
 				user,
 				action
 			})
 		})
 		invalidateAll()
+	}
+
+	async function decision(user: string, action: 'accept' | 'reject') {
+		window.grecaptcha.ready(() => {
+			window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' }).then((token) => {
+				onSubmitDecision(token, user, action)
+			})
+		})
 	}
 </script>
 

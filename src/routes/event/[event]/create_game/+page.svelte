@@ -8,6 +8,7 @@
 	import type { User } from '@prisma/client'
 	import { onMount } from 'svelte'
 	import { DateTime } from 'luxon'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
 	export let data: PageData
 
@@ -50,43 +51,50 @@
 		form.addEventListener('submit', async (event) => {
 			event.preventDefault()
 
-			const body = new FormData(form)
-
-			const name = body.get('name')?.toString()
-
-			if (!name) {
-				body.set('name', `Game ${DateTime.now().toFormat('YYYY-MM-DD HH:mm')}`)
-			}
-
-			const startTime = DateTime.fromISO(body.get('startTime')?.toString() ?? '')
-
-			if (startTime.isValid) {
-				body.set('startTime', startTime.toISO())
-			}
-
-			const durationHours = +(body.get('durationHours')?.toString() ?? '0')
-			const durationMinutes = +(body.get('durationMinutes')?.toString() ?? '0')
-
-			if (isNaN(durationHours) || isNaN(durationMinutes)) {
-				error = 'Invalid duration'
-				return
-			}
-
-			body.delete('durationHours')
-			body.delete('durationMinutes')
-			body.set('durationSeconds', (durationHours * 3600 + durationMinutes * 60).toString())
-
-			body.delete('roster')
-			roster.forEach((player) => {
-				body.append('roster', player.id)
-			})
-
-			const response = await fetch('create_game', {
-				method: 'POST',
-				body
+			window.grecaptcha.ready(() => {
+				window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' }).then(onSubmit)
 			})
 		})
 	})
+
+	async function onSubmit(token: string) {
+		const body = new FormData(form)
+		body.set('token', token)
+
+		const name = body.get('name')?.toString()
+
+		if (!name) {
+			body.set('name', `Game ${DateTime.now().toFormat('YYYY-MM-DD HH:mm')}`)
+		}
+
+		const startTime = DateTime.fromISO(body.get('startTime')?.toString() ?? '')
+
+		if (startTime.isValid) {
+			body.set('startTime', startTime.toISO())
+		}
+
+		const durationHours = +(body.get('durationHours')?.toString() ?? '0')
+		const durationMinutes = +(body.get('durationMinutes')?.toString() ?? '0')
+
+		if (isNaN(durationHours) || isNaN(durationMinutes)) {
+			error = 'Invalid duration'
+			return
+		}
+
+		body.delete('durationHours')
+		body.delete('durationMinutes')
+		body.set('durationSeconds', (durationHours * 3600 + durationMinutes * 60).toString())
+
+		body.delete('roster')
+		roster.forEach((player) => {
+			body.append('roster', player.id)
+		})
+
+		const response = await fetch('create_game', {
+			method: 'POST',
+			body
+		})
+	}
 </script>
 
 <main class="mx-auto max-w-2xl">

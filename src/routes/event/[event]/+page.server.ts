@@ -30,6 +30,16 @@ export const load = (async ({ cookies, params, url }) => {
         error(404, 'Page not found')
     }
 
+    const attendees = await prisma.eventAttendee.findMany({
+        where: {
+            eventId,
+            status: 'ACCEPTED'
+        },
+        include: {
+            user: true
+        }
+    })
+
     const games = await prisma.game.findMany({
         where: {
             eventId
@@ -46,5 +56,5 @@ export const load = (async ({ cookies, params, url }) => {
         }
     })
 
-    return { joinRequestStatus: joinRequest?.status, games }
+    return { joinRequestStatus: joinRequest?.status, games, attendees }
 }) satisfies PageServerLoad;

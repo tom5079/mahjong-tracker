@@ -1,10 +1,14 @@
 import { error } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
 import prisma from "$lib/server/prisma";
 import type { Game } from "@prisma/client";
+import { validateCaptcha } from "$lib/server/captcha";
 
 export const POST = (async ({ params, request }) => {
     const body = await request.formData();
+
+    if (!validateCaptcha(body.get("captcha")?.toString())) {
+        error(400, 'Invalid captcha')
+    }
 
     const durationSeconds = +(body.get("durationSeconds") ?? 0);
 
@@ -66,4 +70,4 @@ export const POST = (async ({ params, request }) => {
     }
 
     return new Response(JSON.stringify(games.map(x => x.id)))
-}) satisfies RequestHandler;
+})

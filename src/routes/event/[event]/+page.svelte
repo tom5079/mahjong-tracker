@@ -5,10 +5,10 @@
 	import type { PageData } from './$types'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
+	import { onMount } from 'svelte'
 
 	export let data: PageData
-
-	$: players = data.games.flatMap((game) => game.players.map((player) => player.user))
 
 	$: states = data.games.map((game) => ({
 		game,
@@ -22,20 +22,36 @@
 	$: currentPage = +($page.url.searchParams.get('page') ?? 1)
 
 	$: leaderboard = Object.entries(
-		states.reduce<Record<string, number>>((acc, { state }) => {
-			if (!state.ok) return acc
-			const match = state.value.match
-			if (match.state !== 'ENDED') return acc
-			match.result.forEach((player) => {
-				if (!acc[player.player]) acc[player.player] = 0
-				acc[player.player] += player.soten - player.penalty
-			})
-			return acc
-		}, {})
+		states.reduce<Record<string, number>>(
+			(acc, { state }) => {
+				if (!state.ok) return acc
+				const match = state.value.match
+				if (match.state !== 'ENDED') return acc
+				match.result.forEach((player) => {
+					acc[player.player] += player.soten - player.penalty
+				})
+				return acc
+			},
+			Object.fromEntries(data.attendees.map((attendee) => [attendee.userId, 0]))
+		)
 	).sort((a, b) => b[1] - a[1])
 
+	onMount(() => {
+		const refresh = setInterval(() => {
+			invalidateAll()
+		}, 5000)
+
+		return () => clearInterval(refresh)
+	})
+
 	async function join() {
-		await fetch(`${data.event.id}/join`, { method: 'POST' })
+		window.grecaptcha.ready(() => {
+			window.grecaptcha
+				.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
+				.then(async (token) => {
+					await fetch(`${data.event.id}/join`, { method: 'POST', body: token })
+				})
+		})
 		invalidateAll()
 	}
 </script>
@@ -78,7 +94,7 @@
 				<th class="p-4 text-right text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
 				{#each leaderboard as [player, score], i}
-					{@const playerUser = players.find((p) => p.id === player)}
+					{@const playerUser = data.attendees.find((p) => p.user.id === player)?.user}
 					<td class="p-4 text-right text-lg">{i + 1}</td>
 					<td class="flex items-center justify-end p-4 text-lg">
 						<img

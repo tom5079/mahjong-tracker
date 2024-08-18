@@ -1,10 +1,14 @@
 import { error } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
 import prisma from "$lib/server/prisma";
 import { validateJoinPolicy } from "$lib/validator";
+import { validateCaptcha } from "$lib/server/captcha";
 
 export const POST = (async ({ params, request }) => {
     const data = await request.formData()
+
+    if (!validateCaptcha(data.get('token')?.toString())) {
+        error(400, 'Invalid captcha')
+    }
 
     const name = data.get('name')?.toString()
 
@@ -48,4 +52,4 @@ export const POST = (async ({ params, request }) => {
     })
 
     return new Response(JSON.stringify({ eventId: event.id }))
-}) satisfies RequestHandler;
+})

@@ -1,11 +1,16 @@
 import { generateScoringSheet } from "$lib/scoring"
+import { validateCaptcha } from "$lib/server/captcha"
 import prisma from "$lib/server/prisma"
 import { validateChonbo, validateScoring, validateUma } from "$lib/validator"
 import { AllLastPolicy, EndgamePolicy, GameLength, MultiRonHonbaPolicy, MultiRonPotPolicy, Players, Record, RenchanPolicy, TiebreakerPolicy } from "@prisma/client"
-import { error, type RequestHandler } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 
 export const POST = (async ({ params, request }) => {
     const data = await request.formData()
+
+    if (!validateCaptcha(data.get('token')?.toString())) {
+        error(400, 'Invalid captcha token')
+    }
 
     const parlorId = +(params.parlor ?? NaN)
 
@@ -291,4 +296,4 @@ export const POST = (async ({ params, request }) => {
     })
 
     return new Response(JSON.stringify({ id: ruleset.id }))
-}) satisfies RequestHandler
+})

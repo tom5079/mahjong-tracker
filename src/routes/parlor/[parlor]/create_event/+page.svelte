@@ -7,6 +7,7 @@
 	import Label from '$lib/form/Label.svelte'
 	import Datetime from '$lib/form/Datetime.svelte'
 	import { DateTime } from 'luxon'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
 	export let data: PageData
 
@@ -28,28 +29,36 @@
 		form.addEventListener('submit', async (event) => {
 			event.preventDefault()
 
-			const body = new FormData(form)
-
-			const joinPolicyUntil = DateTime.fromISO(body.get('joinPolicyUntil')?.toString() ?? '')
-
-			if (joinPolicyUntil.isValid) {
-				body.set('joinPolicyUntil', joinPolicyUntil.toISO())
-			}
-
-			const response = await fetch(`create_event`, {
-				method: 'POST',
-				body
+			window.grecaptcha.ready(() => {
+				window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' }).then(onSubmit)
 			})
-
-			const json = await response.json()
-
-			if (response.ok) {
-				goto(`/event/${json.eventId}`)
-			} else {
-				error = json.message
-			}
 		})
 	})
+
+	async function onSubmit(token: string) {
+		const body = new FormData(form)
+
+		body.set('token', token)
+
+		const joinPolicyUntil = DateTime.fromISO(body.get('joinPolicyUntil')?.toString() ?? '')
+
+		if (joinPolicyUntil.isValid) {
+			body.set('joinPolicyUntil', joinPolicyUntil.toISO())
+		}
+
+		const response = await fetch(`create_event`, {
+			method: 'POST',
+			body
+		})
+
+		const json = await response.json()
+
+		if (response.ok) {
+			goto(`/event/${json.eventId}`)
+		} else {
+			error = json.message
+		}
+	}
 </script>
 
 <main class="mx-auto max-w-2xl space-y-4 p-4">

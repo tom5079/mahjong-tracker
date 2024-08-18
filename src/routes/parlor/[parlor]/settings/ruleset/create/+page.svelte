@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { type ScoringSheet, generateScoringSheet } from '$lib/scoring'
 	import { onMount } from 'svelte'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
 	let form: HTMLFormElement
 	let formData: FormData | null
@@ -42,26 +43,35 @@
 	}
 
 	onMount(() => {
-		formData = new FormData(form)
 		form.addEventListener('submit', (e) => {
 			e.preventDefault()
 
-			formData?.set('scoring', JSON.stringify(scoring))
-			formData?.set('uma', JSON.stringify(uma))
-			formData?.set('chonbo', JSON.stringify(chonbo))
-
-			fetch('create', {
-				method: 'POST',
-				body: formData
-			}).then(async (res) => {
-				if (res.ok) {
-					window.history.back()
-				} else {
-					error = (await res.json()).message
-				}
+			window.grecaptcha.ready(() => {
+				window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' }).then(onSubmit)
 			})
 		})
 	})
+
+	async function onSubmit(token: string) {
+		const formData = new FormData(form)
+
+		formData.set('token', token)
+
+		formData.set('scoring', JSON.stringify(scoring))
+		formData.set('uma', JSON.stringify(uma))
+		formData.set('chonbo', JSON.stringify(chonbo))
+
+		fetch('create', {
+			method: 'POST',
+			body: formData
+		}).then(async (res) => {
+			if (res.ok) {
+				window.history.back()
+			} else {
+				error = (await res.json()).message
+			}
+		})
+	}
 </script>
 
 <main class="mx-auto max-w-2xl p-4">

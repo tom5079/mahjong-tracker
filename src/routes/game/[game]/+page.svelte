@@ -19,6 +19,7 @@
 	import { invalidateAll } from '$app/navigation'
 	import { DateTime, Duration } from 'luxon'
 	import { onMount } from 'svelte'
+	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
 	export let data: PageData
 	let error = ''
@@ -347,13 +348,13 @@
 		}
 	}
 
-	async function submitAction(action: PrismaJson.Action) {
+	async function onSubmitAction(token: string, action: PrismaJson.Action) {
 		const response = await fetch(`${data.game.id}/actions`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(action)
+			body: JSON.stringify({ ...action, token })
 		})
 
 		if (!response.ok) {
@@ -361,6 +362,14 @@
 		}
 
 		invalidateAll()
+	}
+
+	async function submitAction(action: PrismaJson.Action) {
+		window.grecaptcha.ready(() => {
+			window.grecaptcha
+				.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
+				.then((token) => onSubmitAction(token, action))
+		})
 	}
 
 	function onPlayerClick(player: User) {

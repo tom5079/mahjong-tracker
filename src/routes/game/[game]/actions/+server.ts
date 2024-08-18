@@ -3,6 +3,7 @@ import type { RequestHandler } from "./$types";
 import { validateAction } from "$lib/validator";
 import prisma from "$lib/server/prisma";
 import { computeState } from "$lib/game/state";
+import { validateCaptcha } from "$lib/server/captcha";
 
 export const GET = (async ({ params }) => {
     const gameId = +(params.game ?? NaN);
@@ -44,6 +45,10 @@ export const POST = (async ({ params, request }) => {
     }
 
     const action = await request.json()
+
+    if (!validateCaptcha(action.token)) {
+        error(400, 'Invalid action')
+    }
 
     if (!validateAction(action)) {
         error(400, 'Invalid action')
@@ -128,4 +133,4 @@ export const POST = (async ({ params, request }) => {
     })
 
     return new Response(null)
-}) satisfies RequestHandler;
+})

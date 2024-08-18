@@ -1,8 +1,8 @@
 import { error } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
 import prisma from "$lib/server/prisma";
+import { validateCaptcha } from "$lib/server/captcha";
 
-export const POST = (async ({ cookies, params, request }) => {
+export const POST = (async ({ params, request }) => {
     const eventId = +(params.event ?? NaN)
 
     if (isNaN(eventId)) {
@@ -10,6 +10,10 @@ export const POST = (async ({ cookies, params, request }) => {
     }
 
     const data = await request.json()
+
+    if (!validateCaptcha(data.token)) {
+        error(400, 'Invalid captcha')
+    }
 
     const userId = data.user
 
@@ -51,4 +55,4 @@ export const POST = (async ({ cookies, params, request }) => {
     }
 
     return new Response()
-}) satisfies RequestHandler;
+})
