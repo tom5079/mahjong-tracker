@@ -22,7 +22,7 @@ declare global {
 			C: [number, number, number, number]
 		}
 
-		type Scores = ScoringSheet
+		type Score = ScoringSheet
 
 		type Chonbo = ({
 			type: 'score',
@@ -33,6 +33,7 @@ declare global {
 		} | {
 			type: 'custom',
 			dealer: {
+				toDealer: number,
 				toNonDealer: number
 			},
 			nonDealer: {

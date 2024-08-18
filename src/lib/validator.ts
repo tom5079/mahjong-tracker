@@ -31,10 +31,11 @@ export function validateChonbo(chonbo: any, scoring: ScoringSheet): chonbo is Pr
         (chonbo.type === 'score' && typeof chonbo.name === 'string' && scoring.dealer.tsumo.some(([name]) => name === chonbo.name)) ||
         (chonbo.type === 'fixed' && typeof chonbo.point === 'number' && chonbo.point >= 0 && chonbo.point % 100 === 0) ||
         (chonbo.type === 'custom' && typeof chonbo.dealer === 'object' && typeof chonbo.nonDealer === 'object' &&
+            typeof chonbo.dealer.toDealer === 'number' &&
             typeof chonbo.dealer.toNonDealer === 'number' &&
             typeof chonbo.nonDealer.toDealer === 'number' &&
             typeof chonbo.nonDealer.toNonDealer === 'number' &&
-            (chonbo.dealer.toNonDealer >= 0 && chonbo.nonDealer.toDealer >= 0 && chonbo.nonDealer.toNonDealer >= 0) &&
+            (chonbo.dealer.toDealer === 0 && chonbo.dealer.toNonDealer >= 0 && chonbo.nonDealer.toDealer >= 0 && chonbo.nonDealer.toNonDealer >= 0) &&
             (chonbo.dealer.toNonDealer % 100 === 0 && chonbo.nonDealer.toDealer % 100 === 0 && chonbo.nonDealer.toNonDealer % 100 === 0)
         )
 }

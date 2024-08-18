@@ -348,6 +348,8 @@
 	}
 
 	async function onSubmitAction(token: string, action: PrismaJson.Action) {
+		error = ''
+
 		const response = await fetch(`${data.game.id}/actions`, {
 			method: 'POST',
 			headers: {
@@ -436,6 +438,16 @@
 					submitAction({
 						type: 'draw',
 						tenpai: action.tenpai
+					})
+					break
+				case 'chonbo':
+					if (action.player == null) {
+						error = 'Invalid chonbo action'
+						break
+					}
+					submitAction({
+						type: 'chonbo',
+						player: action.player.id
 					})
 					break
 				case 'oyaNagashi':

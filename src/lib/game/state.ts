@@ -532,6 +532,133 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
 
                 break
             }
+            case 'chonbo': {
+                const affectsScore = ruleset.chonbo.affectsScore
+                const chonbo = ruleset.chonbo
+
+                const player = state.players.find(x => x.user.id === action.player)
+
+                if (player == null) {
+                    throw new Error('Player not found')
+                }
+
+                const points: Record<string, number> = Object.fromEntries(
+                    state.players.map(player => [player.user.id, 0])
+                )
+
+                switch (chonbo.type) {
+                    case 'score': {
+                        const score = player.wind === 0 ?
+                            ruleset.scores.dealer.tsumo.find(([name]) => name === chonbo.name)?.[1] :
+                            ruleset.scores.nonDealer.tsumo.find(([name]) => name === chonbo.name)?.[1]
+
+                        if (score == null || Array.isArray(score)) {
+                            throw new Error('Chonbo score not found')
+                        }
+
+                        if (affectsScore) {
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else if (other.wind === 0) {
+                                    points[player.user.id] -= score.fromDealer
+                                    points[other.user.id] += score.fromDealer
+                                } else {
+                                    points[player.user.id] -= score.fromNonDealer
+                                    points[other.user.id] += score.fromNonDealer
+                                }
+                            }
+                        } else {
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else if (other.wind === 0) {
+                                    player.penalty += score.fromDealer
+                                } else {
+                                    player.penalty += score.fromNonDealer
+                                }
+                            }
+                        }
+
+                        break
+                    }
+                    case 'fixed': {
+                        if (affectsScore) {
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else {
+                                    points[other.user.id] += chonbo.point
+                                    points[player.user.id] -= chonbo.point
+                                }
+                            }
+                        } else {
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else {
+                                    player.penalty += chonbo.point
+                                }
+                            }
+                        }
+
+                        break
+                    }
+                    case 'custom': {
+                        if (affectsScore) {
+                            const score = player.wind === 0 ? chonbo.dealer : chonbo.nonDealer
+
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else if (other.wind === 0) {
+                                    points[other.user.id] += score.toDealer
+                                    points[player.user.id] -= score.toDealer
+                                } else {
+                                    points[other.user.id] += score.toNonDealer
+                                    points[player.user.id] -= score.toNonDealer
+                                }
+                            }
+                        } else {
+                            const score = player.wind === 0 ? chonbo.dealer : chonbo.nonDealer
+
+                            for (const other of state.players) {
+                                if (other.user.id === player.user.id) {
+                                    continue
+                                } else if (other.wind === 0) {
+                                    player.score += score.toNonDealer
+                                }
+                            }
+                        }
+
+                        break
+                    }
+                }
+
+                state.history.push({
+                    round: state.round,
+                    repeat: state.repeat,
+                    result: state.players.map(player => ({
+                        player: player.user.id,
+                        score: points[player.user.id],
+                        wind: player.wind,
+                        richi: false,
+                        chonbo: player.user.id === action.player
+                    }))
+                })
+
+                for (const player of state.players) {
+                    player.score += points[player.user.id]
+
+                    if (player.richi) {
+                        player.score += 1000
+                        state.richi--
+                        player.richi = false
+                    }
+                }
+
+                break
+            }
             case 'oyaNagashi': {
                 if (!canPassDealership({ ruleset, state, actions })) {
                     throw new Error('Cannot pass dealership')
