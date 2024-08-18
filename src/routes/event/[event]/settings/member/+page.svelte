@@ -33,7 +33,9 @@
 		<h1 class="text-2xl font-bold">{data.event.name} @ {data.event.parlor.name} Settings</h1>
 	</section>
 	<section>
-		<h2 class="p-4 text-xl font-semibold">Attendees ({data.attendee.length})</h2>
+		<h2 class="p-4 text-xl font-semibold">
+			Attendees ({data.attendee.filter(({ status }) => status === 'ACCEPTED').length})
+		</h2>
 		{#each data.attendee.filter(({ status }) => status === 'ACCEPTED') as attendee}
 			<div class="flex flex-row items-center justify-between space-x-4 p-4">
 				<UserAvatar user={attendee.user} />
