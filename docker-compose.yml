@@ -1,0 +1,24 @@
+services:
+  mahjong-tracker:
+    container_name: mahjong-tracker
+    build: .
+    ports:
+      - '3000:3000'
+    links:
+      - 'db:database'
+    env_file:
+      - .env
+
+  db:
+    container_name: mahjong-tracker-db
+    image: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mahjong-tracker-db:/var/lib/postgresql/data
+
+volumes:
+  mahjong-tracker-db:
