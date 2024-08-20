@@ -21,9 +21,6 @@
 	let userSearch = ''
 	let searchResult = []
 
-	let dragIndex: number | null = null
-	let targetIndex: number | null = null
-
 	let form: HTMLFormElement
 
 	$: searchResult = data.attendees
@@ -188,7 +185,6 @@
 							<li
 								animate:flip={{ duration: 300 }}
 								class="flex flex-row items-center space-x-4 border-gray-300 px-4 py-2"
-								class:bg-gray-300={dragIndex === i}
 								class:border-t={i !== 0 && i % numPlayers === 0}
 							>
 								<span class="material-symbols-rounded cursor-pointer select-none"
