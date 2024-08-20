@@ -521,6 +521,50 @@
 		{error}
 	{:else}
 		<section class="relative my-4 aspect-square rounded-xl bg-slate-200">
+			<button
+				on:click={() => onPlayerClick(state.players[0].user)}
+				class="absolute bottom-2 left-1/2 -translate-x-1/2"
+				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
+				class:border-gray-500={action?.type === 'draw' &&
+					action.tenpai.includes(state.players[0].user.id)}
+				class:border-yellow-500={action?.type === 'chonbo' &&
+					action.player?.id === state.players[0].user.id}
+			>
+				<PlayerScore {...state.players[0]} username={state.players[0].user.username} />
+			</button>
+			<button
+				on:click={() => onPlayerClick(state.players[1].user)}
+				class="absolute right-2 top-1/2 -translate-y-1/2"
+				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
+				class:border-gray-500={action?.type === 'draw' &&
+					action.tenpai.includes(state.players[1].user.id)}
+				class:border-yellow-500={action?.type === 'chonbo' &&
+					action.player?.id === state.players[1].user.id}
+			>
+				<PlayerScore {...state.players[1]} username={state.players[1].user.username} />
+			</button>
+			<button
+				on:click={() => onPlayerClick(state.players[2].user)}
+				class="absolute left-1/2 top-2 -translate-x-1/2"
+				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
+				class:border-gray-500={action?.type === 'draw' &&
+					action.tenpai.includes(state.players[2].user.id)}
+				class:border-yellow-500={action?.type === 'chonbo' &&
+					action.player?.id === state.players[2].user.id}
+			>
+				<PlayerScore {...state.players[2]} username={state.players[2].user.username} />
+			</button>
+			<button
+				on:click={() => onPlayerClick(state.players[3].user)}
+				class="absolute left-2 top-1/2 -translate-y-1/2"
+				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
+				class:border-gray-500={action?.type === 'draw' &&
+					action.tenpai.includes(state.players[3].user.id)}
+				class:border-yellow-500={action?.type === 'chonbo' &&
+					action.player?.id === state.players[3].user.id}
+			>
+				<PlayerScore {...state.players[3]} username={state.players[3].user.username} />
+			</button>
 			<div
 				class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
 			>
@@ -659,50 +703,6 @@
 			{#if displayPoint[9]}
 				<p class="absolute left-[31%] top-[45%]">{displayPoint[9]}</p>
 			{/if}
-			<button
-				on:click={() => onPlayerClick(state.players[0].user)}
-				class="absolute bottom-2 left-1/2 -translate-x-1/2"
-				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
-				class:border-gray-500={action?.type === 'draw' &&
-					action.tenpai.includes(state.players[0].user.id)}
-				class:border-yellow-500={action?.type === 'chonbo' &&
-					action.player?.id === state.players[0].user.id}
-			>
-				<PlayerScore {...state.players[0]} username={state.players[0].user.username} />
-			</button>
-			<button
-				on:click={() => onPlayerClick(state.players[1].user)}
-				class="absolute right-2 top-1/2 -translate-y-1/2"
-				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
-				class:border-gray-500={action?.type === 'draw' &&
-					action.tenpai.includes(state.players[1].user.id)}
-				class:border-yellow-500={action?.type === 'chonbo' &&
-					action.player?.id === state.players[1].user.id}
-			>
-				<PlayerScore {...state.players[1]} username={state.players[1].user.username} />
-			</button>
-			<button
-				on:click={() => onPlayerClick(state.players[2].user)}
-				class="absolute left-1/2 top-2 -translate-x-1/2"
-				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
-				class:border-gray-500={action?.type === 'draw' &&
-					action.tenpai.includes(state.players[2].user.id)}
-				class:border-yellow-500={action?.type === 'chonbo' &&
-					action.player?.id === state.players[2].user.id}
-			>
-				<PlayerScore {...state.players[2]} username={state.players[2].user.username} />
-			</button>
-			<button
-				on:click={() => onPlayerClick(state.players[3].user)}
-				class="absolute left-2 top-1/2 -translate-y-1/2"
-				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
-				class:border-gray-500={action?.type === 'draw' &&
-					action.tenpai.includes(state.players[3].user.id)}
-				class:border-yellow-500={action?.type === 'chonbo' &&
-					action.player?.id === state.players[3].user.id}
-			>
-				<PlayerScore {...state.players[3]} username={state.players[3].user.username} />
-			</button>
 		</section>
 		{#if state.match.state === 'WAITING'}
 			<div class="mx-auto flex max-w-lg">
