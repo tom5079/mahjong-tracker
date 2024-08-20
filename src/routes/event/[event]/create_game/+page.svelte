@@ -6,9 +6,11 @@
 	import Fieldset from '$lib/form/Fieldset.svelte'
 
 	import type { User } from '@prisma/client'
+	import { dndzone } from 'svelte-dnd-action'
 	import { onMount } from 'svelte'
 	import { DateTime } from 'luxon'
 	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
+	import { flip } from 'svelte/animate'
 
 	export let data: PageData
 
@@ -26,9 +28,12 @@
 
 	$: searchResult = data.attendees
 		.filter((x) => (userSearch ? x.username.includes(userSearch) : true))
-		.filter((x) => !roster.includes(x))
+		.filter((x) => roster.every((it) => it.user.id !== x.id))
 
-	let roster: User[] = []
+	let roster: {
+		id: string
+		user: User
+	}[] = []
 
 	function shuffle(array: any[]) {
 		let currentIndex = array.length
@@ -87,7 +92,7 @@
 
 		body.delete('roster')
 		roster.forEach((player) => {
-			body.append('roster', player.id)
+			body.append('roster', player.user.id)
 		})
 
 		const response = await fetch('create_game', {
@@ -101,6 +106,10 @@
 			const body = await response.json()
 			error = body.message
 		}
+	}
+
+	function handleRoster(event: CustomEvent) {
+		roster = event.detail.items
 	}
 </script>
 
@@ -153,7 +162,7 @@
 							{#if searchResult.length > 0}
 								{#each searchResult as user}
 									<button
-										on:mousedown={() => (roster = [...roster, user])}
+										on:mousedown={() => (roster = [...roster, { id: user.id, user }])}
 										class="flex flex-row items-center space-x-2 py-4"
 									>
 										<img
@@ -169,35 +178,29 @@
 							{/if}
 						</div>
 					</div>
-					<ol class="flex flex-col">
-						{#each roster as player, i}
+					<ol
+						class="flex flex-col"
+						use:dndzone={{ items: roster, flipDurationMs: 300 }}
+						on:consider={handleRoster}
+						on:finalize={handleRoster}
+					>
+						{#each roster as player, i (player.id)}
 							<li
-								on:dragstart={() => (dragIndex = i)}
-								on:dragover={() => (targetIndex = i)}
-								on:dragend={() => {
-									if (dragIndex !== null && targetIndex !== null) {
-										const temp = roster[dragIndex]
-										roster[dragIndex] = roster[targetIndex]
-										roster[targetIndex] = temp
-									}
-
-									dragIndex = null
-									targetIndex = null
-								}}
+								animate:flip={{ duration: 300 }}
 								class="flex flex-row items-center space-x-4 border-gray-300 px-4 py-2"
 								class:bg-gray-300={dragIndex === i}
 								class:border-t={i !== 0 && i % numPlayers === 0}
-								draggable="true"
 							>
 								<span class="material-symbols-rounded cursor-pointer select-none"
 									>drag_indicator</span
 								>
 								<img
-									src="https://cdn.discordapp.com/avatars/{player.id}/{player.avatar}.webp"
-									alt="avatar of {player.username}"
+									src="https://cdn.discordapp.com/avatars/{player.user.id}/{player.user
+										.avatar}.webp"
+									alt="avatar of {player.user.username}"
 									class="h-8 w-8 rounded-full"
 								/>
-								<p class="flex-1">{player.username}</p>
+								<p class="flex-1">{player.user.username}</p>
 								{#if Math.floor(roster.length / numPlayers) * numPlayers > i}
 									<p class="text-sm"># {Math.floor(i / numPlayers) + 1}</p>
 									<p class="font-mj text-2xl">{'東南西北'.charAt(i % numPlayers)}</p>
