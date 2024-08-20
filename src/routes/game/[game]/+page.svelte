@@ -507,7 +507,7 @@
 	}
 </script>
 
-<main class="mx-auto max-w-lg">
+<main class="mx-auto max-w-lg px-4">
 	<header class="py-4">
 		<div class="flex flex-row items-center justify-between">
 			<div>
