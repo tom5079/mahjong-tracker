@@ -530,7 +530,7 @@
 		<section class="relative my-4 aspect-square rounded-xl bg-slate-200">
 			<button
 				on:click={() => onPlayerClick(state.players[0].user)}
-				class="absolute bottom-2 left-1/2 -translate-x-1/2"
+				class="absolute bottom-2 left-1/2 max-w-[33%] -translate-x-1/2"
 				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
 				class:border-gray-500={action?.type === 'draw' &&
 					action.tenpai.includes(state.players[0].user.id)}
@@ -552,7 +552,7 @@
 			</button>
 			<button
 				on:click={() => onPlayerClick(state.players[2].user)}
-				class="absolute left-1/2 top-2 -translate-x-1/2"
+				class="absolute left-1/2 top-2 max-w-[33%] -translate-x-1/2"
 				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
 				class:border-gray-500={action?.type === 'draw' &&
 					action.tenpai.includes(state.players[2].user.id)}
