@@ -8,7 +8,7 @@
 	export let chonbo: boolean | undefined = undefined
 </script>
 
-<p class="flex flex-row items-center space-x-2 text-nowrap border">
+<p class="flex flex-row items-center space-x-2">
 	<span
 		class="space-x-2 truncate rounded p-1"
 		class:bg-blue-500={richi}
