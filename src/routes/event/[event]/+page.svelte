@@ -160,67 +160,61 @@
 					</p>
 
 					{#if state.ok}
-						<table class="mt-4 table-auto">
-							<tbody>
-								{#each state.value.players.sort((a, b) => {
-									const match = state.value.match
-									if (match.state === 'ENDED') {
-										const scores = match.result.map( (it) => ({ ...it, score: it.soten - it.penalty }) )
+						<div class="grid-cols-gamescore mt-4 grid text-lg">
+							{#each state.value.players.sort((a, b) => {
+								const match = state.value.match
+								if (match.state === 'ENDED') {
+									const scores = match.result.map((it) => ({ ...it, score: it.soten - it.penalty }))
 
-										const aScore = scores.find((it) => it.player === a.user.id)?.score ?? 0
-										const bScore = scores.find((it) => it.player === b.user.id)?.score ?? 0
+									const aScore = scores.find((it) => it.player === a.user.id)?.score ?? 0
+									const bScore = scores.find((it) => it.player === b.user.id)?.score ?? 0
 
-										return bScore - aScore
-									}
-									return b.score - a.score
-								}) as player}
-									<tr class="text-lg">
-										<td class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</td>
-										<td class="truncate pr-8">
-											{player.user.username}
+									return bScore - aScore
+								}
+								return b.score - a.score
+							}) as player}
+								<td class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</td>
+								<td class="truncate pr-8">
+									{player.user.username}
+								</td>
+								{#if state.value.match.state === 'ENDED'}
+									{@const score = state.value.match.result.find((p) => p.player === player.user.id)}
+									{#if score == null}
+										<td class="text-red-500">Error</td>
+									{:else}
+										{@const finalScore = score.soten - score.penalty}
+										<td
+											class="relative"
+											class:text-blue-500={finalScore > 0}
+											class:text-red-500={finalScore < 0}
+										>
+											{#if finalScore < 0}<span class="absolute -left-2">-</span>{/if}
+											<span>
+												{Math.abs(finalScore) / 10}
+											</span>
 										</td>
-										{#if state.value.match.state === 'ENDED'}
-											{@const score = state.value.match.result.find(
-												(p) => p.player === player.user.id
-											)}
-											{#if score == null}
-												<td class="text-red-500">Error</td>
-											{:else}
-												{@const finalScore = score.soten - score.penalty}
-												<td
-													class="relative"
-													class:text-blue-500={finalScore > 0}
-													class:text-red-500={finalScore < 0}
-												>
-													{#if finalScore < 0}<span class="absolute -left-2">-</span>{/if}
-													<span>
-														{Math.abs(finalScore) / 10}
-													</span>
-												</td>
-											{/if}
-										{:else if state.value.match.state !== 'WAITING'}
-											{@const score = state.value.players.find(
-												(p) => p.user.id === player.user.id
-											)?.score}
-											{#if score == null}
-												<td class="text-red-500">Error</td>
-											{:else}
-												<td
-													class="relative"
-													class:text-blue-500={score > data.event.ruleset.startScore}
-													class:text-red-500={score < data.event.ruleset.startScore}
-												>
-													{#if score < 0}<span class="absolute -left-2">-</span>{/if}
-													<span>
-														{Math.abs(score)}
-													</span>
-												</td>
-											{/if}
-										{/if}
-									</tr>
-								{/each}
-							</tbody>
-						</table>
+									{/if}
+								{:else if state.value.match.state !== 'WAITING'}
+									{@const score = state.value.players.find(
+										(p) => p.user.id === player.user.id
+									)?.score}
+									{#if score == null}
+										<td class="text-red-500">Error</td>
+									{:else}
+										<td
+											class="relative"
+											class:text-blue-500={score > data.event.ruleset.startScore}
+											class:text-red-500={score < data.event.ruleset.startScore}
+										>
+											{#if score < 0}<span class="absolute -left-2">-</span>{/if}
+											<span>
+												{Math.abs(score)}
+											</span>
+										</td>
+									{/if}
+								{/if}
+							{/each}
+						</div>
 					{/if}
 				</div>
 				<span class="material-symbols-rounded my-auto">chevron_right</span>
