@@ -379,7 +379,8 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                         player: player.user.id,
                         score: (player.user.id === action.loser
                             ? -Object.entries(payments).reduce((acc, [, { payment }]) => acc + payment, 0)
-                            : (payments[player.user.id]?.payment ?? 0) + (payments[player.user.id]?.fromPot ?? 0)),
+                            : (payments[player.user.id]?.payment ?? 0) + (payments[player.user.id]?.fromPot ?? 0))
+                            - (player.richi ? 1000 : 0),
                         wind: player.wind,
                         richi: player.richi,
                         chonbo: false
@@ -442,7 +443,8 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                         player: player.user.id,
                         score: (player.user.id === action.winner
                             ? Object.entries(payments.payments).reduce((acc, [, payment]) => acc + payment, 0) + payments.fromPot
-                            : -payments.payments[player.user.id]),
+                            : -payments.payments[player.user.id])
+                            - (player.richi ? 1000 : 0),
                         wind: player.wind,
                         richi: player.richi,
                         chonbo: false
@@ -493,9 +495,10 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                     repeat: state.repeat,
                     result: state.players.map(player => ({
                         player: player.user.id,
-                        score: action.tenpai.includes(player.user.id)
+                        score: (action.tenpai.includes(player.user.id)
                             ? tenpaiFeeReceived
-                            : -tenpaiFeePaid,
+                            : -tenpaiFeePaid)
+                            - (player.richi ? 1000 : 0),
                         wind: player.wind,
                         richi: player.richi,
                         chonbo: false
