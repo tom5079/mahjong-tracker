@@ -14,7 +14,7 @@
 >
 	<div class="flex items-center space-x-4">
 		<span class="font-mj text-2xl">{convertWind(wind)}</span>
-		<span>{username}</span>
+		<span class="trucate">{username}</span>
 	</div>
 	<p class="text-4xl">{score / 100}</p>
 </div>

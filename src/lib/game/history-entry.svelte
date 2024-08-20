@@ -15,7 +15,7 @@
 		class:bg-yellow-500={chonbo}
 		class:text-white={richi || chonbo}
 	>
-		<span class="font-mj">{convertWind(wind)}</span><span>{username}</span></span
+		<span class="font-mj">{convertWind(wind)}</span><span class="truncate">{username}</span></span
 	>
 	{#if score}
 		<span class:text-red-700={score < 0} class:text-blue-700={score > 0}

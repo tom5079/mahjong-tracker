@@ -90,7 +90,7 @@
 	<section class="p-4">
 		<div class="flex flex-col space-y-4">
 			<h2 class="text-xl font-semibold">Leaderboard</h2>
-			<div class="grid-cols-leaderboard grid rounded-lg border">
+			<div class="grid grid-cols-leaderboard rounded-lg border">
 				<th class="p-4 text-right text-lg">Position</th>
 				<th class="p-4 text-left text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
@@ -100,7 +100,7 @@
 						<td class="p-4 text-right text-lg">{i + 1}</td>
 						<td class="flex flex-row items-center p-4 text-lg">
 							<UserAvatar user={playerUser} />
-							<span class="ml-4">{playerUser?.username}</span>
+							<span class="ml-4 truncate">{playerUser?.username}</span>
 						</td>
 						<td class="p-4 text-right text-lg">{score / 10}</td>
 					{/if}
@@ -176,7 +176,7 @@
 								}) as player}
 									<tr class="text-lg">
 										<td class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</td>
-										<td class="pr-8">
+										<td class="truncate pr-8">
 											{player.user.username}
 										</td>
 										{#if state.value.match.state === 'ENDED'}

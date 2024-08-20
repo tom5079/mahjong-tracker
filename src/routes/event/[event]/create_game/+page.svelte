@@ -200,7 +200,7 @@
 									alt="avatar of {player.user.username}"
 									class="h-8 w-8 rounded-full"
 								/>
-								<p class="flex-1">{player.user.username}</p>
+								<p class="flex-1 truncate">{player.user.username}</p>
 								{#if Math.floor(roster.length / numPlayers) * numPlayers > i}
 									<p class="text-sm"># {Math.floor(i / numPlayers) + 1}</p>
 									<p class="font-mj text-2xl">{'東南西北'.charAt(i % numPlayers)}</p>
