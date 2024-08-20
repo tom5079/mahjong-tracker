@@ -82,6 +82,13 @@
 
 	let timeLeft: Duration | null = null
 
+	const historyActions = {
+		ron: ['Ron', 'bg-red-500'],
+		tsumo: ['Tsumo', 'bg-blue-500'],
+		draw: ['Draw', 'bg-gray-500'],
+		chonbo: ['Chonbo', 'bg-yellow-500']
+	}
+
 	onMount(() => {
 		if (!data.game.durationSeconds) {
 			return
@@ -814,6 +821,9 @@
 								<div class="flex flex-row items-center justify-between">
 									<p class="my-4 font-mj text-2xl">
 										{convertRound(history.round)} / {history.repeat}本場
+									</p>
+									<p class="rounded-lg px-4 py-2 text-white {historyActions[history.action][1]}">
+										{historyActions[history.action][0]}
 									</p>
 								</div>
 								<div class="grid grid-cols-2 gap-2">

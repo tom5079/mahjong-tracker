@@ -37,6 +37,7 @@ export type State = {
     history: {
         round: number
         repeat: number
+        action: 'ron' | 'tsumo' | 'draw' | 'chonbo'
         result: {
             player: string
             wind: number
@@ -375,6 +376,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 state.history.push({
                     round: state.round,
                     repeat: state.repeat,
+                    action: 'ron',
                     result: state.players.map(player => ({
                         player: player.user.id,
                         score: (player.user.id === action.loser
@@ -439,6 +441,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 state.history.push({
                     round: state.round,
                     repeat: state.repeat,
+                    action: 'tsumo',
                     result: state.players.map(player => ({
                         player: player.user.id,
                         score: (player.user.id === action.winner
@@ -493,6 +496,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 state.history.push({
                     round: state.round,
                     repeat: state.repeat,
+                    action: 'draw',
                     result: state.players.map(player => ({
                         player: player.user.id,
                         score: (action.tenpai.includes(player.user.id)
@@ -641,6 +645,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 state.history.push({
                     round: state.round,
                     repeat: state.repeat,
+                    action: 'chonbo',
                     result: state.players.map(player => ({
                         player: player.user.id,
                         score: points[player.user.id],
