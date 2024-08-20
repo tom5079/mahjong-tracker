@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let scores: PrismaJson.Scores['dealer']
+	export let scores: PrismaJson.Score['dealer']
 	export let onScore: (score: { fromDealer: number; fromNonDealer: number }) => void
 
 	let category = [scores.tsumo]
