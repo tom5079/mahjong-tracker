@@ -11,9 +11,12 @@
 			<span class="material-symbols-rounded mr-2">add</span> New</a
 		>
 	</section>
-	<section class="flex flex-col">
+	<section class="flex flex-col divide-y rounded-lg border p-2">
 		{#each data.rulesets as ruleset}
-			<p>{ruleset.name}</p>
+			<a href="ruleset/{ruleset.id}" class="flex flex-row items-center justify-between p-4 text-lg"
+				>{ruleset.name}
+				<span class="material-symbols-rounded">chevron_right</span>
+			</a>
 		{/each}
 	</section>
 </main>

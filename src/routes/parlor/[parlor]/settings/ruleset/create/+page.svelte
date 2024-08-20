@@ -2,7 +2,6 @@
 	import { type ScoringSheet, generateScoringSheet } from '$lib/scoring'
 	import { onMount } from 'svelte'
 	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
-	import { todo } from 'node:test'
 
 	let form: HTMLFormElement
 	let formData: FormData | null
