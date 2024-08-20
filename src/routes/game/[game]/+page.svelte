@@ -541,7 +541,7 @@
 			</button>
 			<button
 				on:click={() => onPlayerClick(state.players[1].user)}
-				class="absolute right-2 top-1/2 -translate-y-1/2"
+				class="absolute right-2 top-1/2 max-w-[33%] -translate-y-1/2"
 				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
 				class:border-gray-500={action?.type === 'draw' &&
 					action.tenpai.includes(state.players[1].user.id)}
@@ -563,7 +563,7 @@
 			</button>
 			<button
 				on:click={() => onPlayerClick(state.players[3].user)}
-				class="absolute left-2 top-1/2 -translate-y-1/2"
+				class="absolute left-2 top-1/2 max-w-[33%] -translate-y-1/2"
 				class:border-b-4={action?.type === 'draw' || action?.type === 'chonbo'}
 				class:border-gray-500={action?.type === 'draw' &&
 					action.tenpai.includes(state.players[3].user.id)}
