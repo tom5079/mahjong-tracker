@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import type { PageServerLoad } from "./$types";
+import type { LayoutServerLoad } from "./$types";
 import prisma from "$lib/server/prisma";
 
 export const load = (async ({ params }) => {
@@ -35,4 +35,4 @@ export const load = (async ({ params }) => {
     }
 
     return { game }
-}) satisfies PageServerLoad;
+}) satisfies LayoutServerLoad;

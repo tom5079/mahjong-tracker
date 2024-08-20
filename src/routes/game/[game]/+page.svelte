@@ -509,8 +509,13 @@
 
 <main class="mx-auto max-w-lg">
 	<header class="py-4">
-		<p class="text-2xl font-bold">{data.game.name}</p>
-		<p>Table {data.game.table}</p>
+		<div class="flex flex-row items-center justify-between">
+			<div>
+				<p class="text-2xl font-bold">{data.game.name}</p>
+				<p>Table {data.game.table}</p>
+			</div>
+			<a href="{data.game.id}/settings" class="material-symbols-rounded filled"> settings </a>
+		</div>
 	</header>
 	{#if state == null}
 		{error}

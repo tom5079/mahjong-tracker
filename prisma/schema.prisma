@@ -64,11 +64,11 @@ model Event {
 }
 
 model EventAttendee {
-  user    User                   @relation(fields: [userId], references: [id])
+  user    User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  String
   eventId Int
   status  EventJoinRequestStatus
-  event   Event                  @relation(fields: [eventId], references: [id])
+  event   Event                  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   @@id([userId, eventId])
 }
 
@@ -81,15 +81,15 @@ model Game {
   players         GamePlayer[]
   /// [Actions]
   actions         Json
-  event           Event    @relation(fields: [eventId], references: [id])
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId         Int
 }
 
 model GamePlayer {
   gameId  Int
   userId  String
-  user    User    @relation(fields: [userId], references: [id])
-  game    Game    @relation(fields: [gameId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game    Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
   index   Int
   @@id([gameId, userId])
 }
