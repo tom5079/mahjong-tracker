@@ -63,6 +63,9 @@ export const POST = (async ({ params, request }) => {
                 players: {
                     include: {
                         user: true
+                    },
+                    orderBy: {
+                        index: 'asc'
                     }
                 },
                 event: {

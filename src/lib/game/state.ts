@@ -251,7 +251,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
 
     for (const action of actions) {
         if (state.match.state === 'ENDED') {
-            throw new Error('Game is already done')
+            throw new Error('Game has already ended')
         }
 
         if (state.match.state === 'WAITING' && action.type !== 'start') {
@@ -377,9 +377,9 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                     repeat: state.repeat,
                     result: state.players.map(player => ({
                         player: player.user.id,
-                        score: player.user.id === action.loser
+                        score: (player.user.id === action.loser
                             ? -Object.entries(payments).reduce((acc, [, { payment }]) => acc + payment, 0)
-                            : (payments[player.user.id]?.payment ?? 0) + (payments[player.user.id]?.fromPot ?? 0),
+                            : (payments[player.user.id]?.payment ?? 0) + (payments[player.user.id]?.fromPot ?? 0)),
                         wind: player.wind,
                         richi: player.richi,
                         chonbo: false
@@ -440,9 +440,9 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                     repeat: state.repeat,
                     result: state.players.map(player => ({
                         player: player.user.id,
-                        score: player.user.id === action.winner
+                        score: (player.user.id === action.winner
                             ? Object.entries(payments.payments).reduce((acc, [, payment]) => acc + payment, 0) + payments.fromPot
-                            : -payments.payments[player.user.id],
+                            : -payments.payments[player.user.id]),
                         wind: player.wind,
                         richi: player.richi,
                         chonbo: false

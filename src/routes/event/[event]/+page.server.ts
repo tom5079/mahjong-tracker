@@ -48,6 +48,9 @@ export const load = (async ({ cookies, params, url }) => {
             players: {
                 include: {
                     user: true
+                },
+                orderBy: {
+                    index: 'asc'
                 }
             }
         },

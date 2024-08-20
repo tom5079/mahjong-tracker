@@ -3,8 +3,6 @@
 	export let onScore: (score: { fromDealer: number; fromNonDealer: number }) => void
 
 	let category = [scores.tsumo]
-
-	console.log(scores.tsumo)
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4">
