@@ -8,9 +8,9 @@
 	export let chonbo: boolean | undefined = undefined
 </script>
 
-<p class="justify-center space-x-2">
+<p class="flex flex-row items-center space-x-2 text-nowrap border">
 	<span
-		class="space-x-2 rounded p-1"
+		class="space-x-2 truncate rounded p-1"
 		class:bg-blue-500={richi}
 		class:bg-yellow-500={chonbo}
 		class:text-white={richi || chonbo}
