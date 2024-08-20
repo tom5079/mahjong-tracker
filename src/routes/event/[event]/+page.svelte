@@ -91,7 +91,7 @@
 		<div class="flex flex-col space-y-4">
 			<h2 class="text-xl font-semibold">Leaderboard</h2>
 			<div class="grid grid-cols-leaderboard rounded-lg border">
-				<th class="p-4 text-right text-lg">Position</th>
+				<th class="p-4 text-right text-lg">#</th>
 				<th class="p-4 text-left text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
 				{#each leaderboard as [player, score], i}
