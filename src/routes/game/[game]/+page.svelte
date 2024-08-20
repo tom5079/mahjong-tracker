@@ -575,7 +575,7 @@
 				</div>
 			</div>
 			<svg
-				class="absolute left-0 right-0 h-full w-full text-red-500"
+				class="pointer-events-none absolute left-0 right-0 h-full w-full text-red-500"
 				viewBox="0 0 256 256"
 				xmlns="http://www.w3.org/2000/svg"
 			>
