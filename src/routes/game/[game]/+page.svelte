@@ -71,6 +71,9 @@
 		| {
 				type: 'oyaNagashi'
 		  }
+		| {
+				type: 'undo'
+		  }
 		| null = null
 
 	let activeWinner: User | null = null
@@ -461,6 +464,9 @@
 						at: DateTime.now().toISO()
 					})
 					break
+				case 'undo':
+					undo()
+					break
 			}
 		}
 
@@ -482,6 +488,23 @@
 	function chonbo() {
 		action = { type: 'chonbo', player: null }
 	}
+
+	function undo() {
+		window.grecaptcha.ready(() => {
+			window.grecaptcha.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'undo' }).then((token) => {
+				fetch(`${data.game.id}/actions`, {
+					method: 'DELETE',
+					body: token
+				}).then(async (r) => {
+					if (!r.ok) {
+						error = (await r.json()).message
+					}
+
+					invalidateAll()
+				})
+			})
+		})
+	}
 </script>
 
 <main class="mx-auto max-w-lg">
@@ -492,7 +515,7 @@
 	{#if state == null}
 		{error}
 	{:else}
-		<section class="relative aspect-square rounded-xl bg-slate-200">
+		<section class="relative my-4 aspect-square rounded-xl bg-slate-200">
 			<div
 				class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
 			>
@@ -772,7 +795,14 @@
 							</div>
 						</div>
 					{/if}
-					<p class="font-bold">History</p>
+					<div class="flex flex-row items-center justify-between">
+						<p class="font-bold">History</p>
+						<button
+							on:click={() => (action = { type: 'undo' })}
+							class="flex flex-row items-center rounded-lg border border-red-500 p-4 text-red-500 transition-all hover:bg-red-500 hover:text-white"
+							><span class="material-symbols-rounded mr-2">remove</span> Undo</button
+						>
+					</div>
 					<div>
 						{#each [...state.history].reverse() as history}
 							<div>
@@ -1025,6 +1055,22 @@
 						</button>
 					</div>
 					<p class="w-full py-16 text-center text-2xl">Click submit to pass the dealership</p>
+				</section>
+			{:else if action.type === 'undo'}
+				<section class="mx-auto max-w-lg">
+					<div class="flex flex-row items-center">
+						<button on:click={() => (action = null)} class="material-symbols-rounded p-4 text-3xl">
+							arrow_back
+						</button>
+						<p class="text-2xl">Undo last action</p>
+						<button
+							on:click={submit}
+							class="ml-auto flex flex-row items-center space-x-4 p-4 text-green-500"
+						>
+							<span class="material-symbols-rounded text-3xl">check</span> Submit
+						</button>
+					</div>
+					<p class="w-full py-16 text-center text-2xl">Click submit to undo last action</p>
 				</section>
 			{/if}
 		{/if}

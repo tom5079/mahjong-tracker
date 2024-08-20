@@ -134,3 +134,68 @@ export const POST = (async ({ params, request }) => {
 
     return new Response(null)
 })
+
+export const DELETE = (async ({ params, request }) => {
+    const captchaToken = await request.text()
+
+    if (!validateCaptcha(captchaToken)) {
+        error(400, 'Invalid Captcha')
+    }
+
+    const gameId = +(params.game ?? NaN);
+
+    if (isNaN(gameId)) {
+        error(404, 'Game not found')
+    }
+
+    await prisma.$transaction(async (tx) => {
+        const game = await tx.game.findUnique({
+            where: {
+                id: gameId
+            },
+            include: {
+                players: {
+                    include: {
+                        user: true
+                    }
+                },
+                event: {
+                    include: {
+                        ruleset: true
+                    }
+                }
+            }
+        })
+
+        const actions = game?.actions
+
+        if (game == null || actions == null) {
+            error(404, 'Game not found')
+        }
+
+        const actionsType = [
+            'ron',
+            'tsumo',
+            'draw',
+            'chonbo',
+            'oyaNagashi',
+            'end'
+        ]
+        const lastAction = actions.findLastIndex(it => actionsType.includes(it.type))
+
+        if (lastAction === -1) {
+            error(400, 'No action to undo')
+        }
+
+        await tx.game.update({
+            where: {
+                id: gameId
+            },
+            data: {
+                actions: actions.slice(0, lastAction)
+            }
+        })
+    })
+
+    return new Response(null)
+})
