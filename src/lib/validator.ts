@@ -51,6 +51,90 @@ export function validateJoinPolicy(joinPolicy: any): joinPolicy is PrismaJson.Ev
                         DateTime.fromISO(joinPolicy.until) > DateTime.now()))))
 }
 
+function checkObjectSN(object: any, max: number | undefined = undefined): object is { [key: string]: number } {
+    return object != null && typeof object === 'object' && Object.entries(object).every(([k, v]) => typeof k === 'string' && v != 'number')
+        && (max == null || Object.entries(object).length <= max)
+}
+
+function checkArrayN(array: any, max: number | undefined): array is number[] {
+    return array != null && Array.isArray(array) && array.every((x) => typeof x === 'number')
+        && (max == null || array.length <= max)
+}
+
+export function sanitizeTimerAction(action: any): PrismaJson.TimerAction | null {
+    if (action == null || typeof action !== 'object' || typeof action.type !== 'string') {
+        return null
+    }
+
+    if (['start', 'pause', 'resume', 'end'].includes(action.type)) {
+        return { type: action.type }
+    }
+
+    return null
+}
+
+export function sanitizeAction(action: any): PrismaJson.Action | null {
+    if (action == null || typeof action !== 'object' || typeof action.type !== 'string') {
+        return null
+    }
+
+    switch (action.type) {
+        case 'end':
+            if (typeof action.at !== 'string' || !DateTime.fromISO(action.at).isValid) {
+                return null
+            }
+            return { type: 'end' }
+        case 'riichi':
+            if (typeof action.player !== 'string') {
+                return null
+            }
+
+            return { type: 'riichi', player: action.player }
+        case 'ron':
+            if (typeof action.loser !== 'string') {
+                return null
+            }
+
+            if (!checkObjectSN(action.scores, 4)) {
+                return null
+            }
+
+            return { type: 'ron', loser: action.loser, scores: action.scores }
+        case 'tsumo':
+            if (typeof action.winner !== 'string') {
+                return null
+            }
+
+            if (!checkObjectSN(action.scores, 4)) {
+                return null
+            }
+
+            return { type: 'tsumo', winner: action.winner, scores: action.scores }
+        case 'draw':
+            if (!checkArrayN(action.tenpai, 4)) {
+                return null
+            }
+
+            return { type: 'draw', tenpai: action.tenpai }
+        case 'chonbo':
+            if (typeof action.player !== 'string') {
+                return null
+            }
+
+            return { type: 'chonbo', player: action.player }
+        case 'nagashi':
+            if (!checkArrayN(action.players, 4)) {
+                return null
+            }
+
+            return { type: 'nagashi', players: action.players }
+        case 'oyaNagashi':
+            return { type: 'oyaNagashi' }
+        default:
+            return null
+    }
+}
+
 export function validateAction(action: any): action is PrismaJson.Action {
     return action != null &&
         typeof action === 'object' &&

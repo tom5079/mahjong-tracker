@@ -1,9 +1,10 @@
 import { error, json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { validateAction } from "$lib/validator";
+import { sanitizeAction, sanitizeTimerAction } from "$lib/validator";
 import prisma from "$lib/server/prisma";
 import { computeState } from "$lib/game/state";
 import { validateCaptcha } from "$lib/server/captcha";
+import { DateTime, Duration } from "luxon";
 
 export const GET = (async ({ params }) => {
     const gameId = +(params.game ?? NaN);
@@ -25,6 +26,9 @@ export const GET = (async ({ params }) => {
             players: {
                 include: {
                     user: true
+                },
+                orderBy: {
+                    index: 'asc'
                 }
             }
         }
@@ -50,7 +54,9 @@ export const POST = (async ({ params, request }) => {
         error(400, 'Invalid action')
     }
 
-    if (!validateAction(action)) {
+    const sanitizedAction = sanitizeTimerAction(action) || sanitizeAction(action)
+
+    if (!sanitizedAction) {
         error(400, 'Invalid action')
     }
 
@@ -59,7 +65,9 @@ export const POST = (async ({ params, request }) => {
             where: {
                 id: gameId
             },
-            include: {
+            select: {
+                timer: true,
+                actions: true,
                 players: {
                     include: {
                         user: true
@@ -77,20 +85,21 @@ export const POST = (async ({ params, request }) => {
         })
 
         const actions = game?.actions
+        let timer = game?.timer
 
-        if (game == null || actions == null) {
+        if (game == null || actions == null || timer == null) {
             error(404, 'Game not found')
         }
 
 
-        switch (action.type) {
+        switch (sanitizedAction.type) {
             case 'riichi': {
-                if (game.players.find(it => it.user.id === action.player) == null) {
+                if (game.players.find(it => it.user.id === sanitizedAction.player) == null) {
                     error(400, 'Player not found')
                 }
 
                 const riichiIndex = actions.findLastIndex(it =>
-                    it.type !== 'riichi' || it.player === action.player)
+                    it.type !== 'riichi' || it.player === sanitizedAction.player)
 
                 if (riichiIndex !== -1 && actions[riichiIndex].type === 'riichi') {
                     actions.splice(riichiIndex, 1)
@@ -99,12 +108,55 @@ export const POST = (async ({ params, request }) => {
 
                 actions.push({
                     type: 'riichi',
-                    player: action.player
+                    player: sanitizedAction.player
                 })
                 break
             }
+            case 'start': {
+                if (timer.state !== 'waiting') {
+                    error(400, 'Invalid action')
+                }
+
+                timer = {
+                    state: 'running',
+                    startedAt: DateTime.now().toISO(),
+                    pausedBy: Duration.fromMillis(0).toISO()
+                }
+                break
+            }
+            case 'pause': {
+                if (timer.state !== 'running') {
+                    error(400, 'Invalid action')
+                }
+
+                timer = {
+                    state: 'paused',
+                    startedAt: timer.startedAt,
+                    pausedAt: DateTime.now().toISO(),
+                    pausedBy: timer.pausedBy
+                }
+                break
+            }
+            case 'resume': {
+                if (timer.state !== 'paused') {
+                    error(400, 'Invalid action')
+                }
+
+                timer = {
+                    state: 'running',
+                    startedAt: timer.startedAt,
+                    pausedBy: Duration.fromISO(timer.pausedBy).plus(
+                        DateTime.now().diff(DateTime.fromISO(timer.pausedAt))
+                    ).toISO()!
+                }
+                break
+            }
             default:
-                actions.push(action)
+                if (game.timer.state !== 'running') {
+                    error(400, 'Game is not running')
+                }
+
+                actions.push(sanitizedAction)
                 break
         }
 
@@ -125,12 +177,26 @@ export const POST = (async ({ params, request }) => {
             }
         }
 
+        if (state.value.match.state === 'ENDED') {
+            if (timer.state === 'waiting') {
+                error(400, 'Invalid state')
+            }
+
+            timer = {
+                state: 'ended',
+                startedAt: timer.startedAt,
+                pausedBy: timer.pausedBy,
+                endedAt: DateTime.now().toISO()
+            }
+        }
+
         await tx.game.update({
             where: {
                 id: gameId
             },
             data: {
-                actions
+                actions,
+                timer
             }
         })
     })
@@ -171,8 +237,9 @@ export const DELETE = (async ({ params, request }) => {
         })
 
         const actions = game?.actions
+        let timer = game?.timer
 
-        if (game == null || actions == null) {
+        if (game == null || actions == null || timer == null) {
             error(404, 'Game not found')
         }
 
@@ -190,12 +257,27 @@ export const DELETE = (async ({ params, request }) => {
             error(400, 'No action to undo')
         }
 
+        if (actions[lastAction].type === 'end') {
+            if (timer.state !== 'ended') {
+                error(400, 'Invalid state')
+            }
+
+            timer = {
+                state: 'running',
+                startedAt: timer.startedAt,
+                pausedBy: Duration.fromISO(timer.pausedBy).plus(
+                    DateTime.now().diff(DateTime.fromISO(timer.endedAt))
+                ).toISO()!
+            }
+        }
+
         await tx.game.update({
             where: {
                 id: gameId
             },
             data: {
-                actions: actions.slice(0, lastAction)
+                actions: actions.slice(0, lastAction),
+                timer
             }
         })
     })

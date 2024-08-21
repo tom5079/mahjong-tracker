@@ -81,6 +81,7 @@
 	let displayPoint: number[] = Array(10).fill(0)
 
 	let timeLeft: Duration | null = null
+	let timeLeftToStart: Duration | null = null
 
 	const historyActions = {
 		ron: ['Ron', 'bg-red-500'],
@@ -95,19 +96,27 @@
 		}
 
 		const timer = setInterval(() => {
-			switch (state?.match.state) {
-				case 'RUNNING': {
-					timeLeft = state.match.startedAt
+			switch (data.game.timer.state) {
+				case 'waiting': {
+					const startTime = data.game.startTime
+
+					if (startTime) {
+						timeLeftToStart = DateTime.fromISO(startTime.toISOString()).diffNow()
+					}
+					break
+				}
+				case 'running': {
+					timeLeft = DateTime.fromISO(data.game.timer.startedAt)
 						.plus({ seconds: data.game.durationSeconds })
-						.plus(state.match.pausedBy)
+						.plus(Duration.fromISO(data.game.timer.pausedBy))
 						.diffNow()
 					break
 				}
-				case 'PAUSED': {
-					timeLeft = state.match.startedAt
+				case 'paused': {
+					timeLeft = DateTime.fromISO(data.game.timer.startedAt)
 						.plus({ seconds: data.game.durationSeconds })
-						.plus(state.match.pausedBy)
-						.diff(state.match.pausedAt)
+						.plus(Duration.fromISO(data.game.timer.pausedBy))
+						.diff(DateTime.fromISO(data.game.timer.pausedAt))
 					break
 				}
 				default: {
@@ -357,7 +366,7 @@
 		}
 	}
 
-	async function onSubmitAction(token: string, action: PrismaJson.Action) {
+	async function onSubmitAction(token: string, action: PrismaJson.Action | PrismaJson.TimerAction) {
 		error = ''
 
 		const response = await fetch(`${data.game.id}/actions`, {
@@ -375,7 +384,7 @@
 		invalidateAll()
 	}
 
-	async function submitAction(action: PrismaJson.Action) {
+	async function submitAction(action: PrismaJson.Action | PrismaJson.TimerAction) {
 		window.grecaptcha.ready(() => {
 			window.grecaptcha
 				.execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
@@ -466,10 +475,7 @@
 					})
 					break
 				case 'end':
-					submitAction({
-						type: 'end',
-						at: DateTime.now().toISO()
-					})
+					submitAction({ type: 'end' })
 					break
 				case 'undo':
 					undo()
@@ -711,17 +717,16 @@
 				<p class="absolute left-[31%] top-[45%]">{displayPoint[9]}</p>
 			{/if}
 		</section>
-		{#if state.match.state === 'WAITING'}
+		{#if data.game.timer.state === 'waiting'}
 			<div class="mx-auto flex max-w-lg">
 				<button
-					on:click={() =>
-						submitAction({
-							type: 'start',
-							at: DateTime.now().toISO()
-						})}
+					on:click={() => submitAction({ type: 'start' })}
 					class="my-8 flex-1 rounded-lg bg-red-500 py-8 text-2xl text-white"
 				>
-					<p>Start Game</p>
+					<p>
+						Start Game{#if timeLeftToStart}
+							{`-${timeLeftToStart.toFormat('hh:mm:ss')}`}{/if}
+					</p>
 				</button>
 			</div>
 		{:else}
@@ -730,24 +735,16 @@
 					<p class="text-2xl font-bold">
 						{#if timeLeft.toMillis() > 0}{timeLeft.toFormat('hh:mm:ss')}{:else}Last Round{/if}
 					</p>
-					{#if state.match.state === 'RUNNING'}
+					{#if data.game.timer.state === 'running'}
 						<button
-							on:click={() =>
-								submitAction({
-									type: 'pause',
-									at: DateTime.now().toISO()
-								})}
+							on:click={() => submitAction({ type: 'pause' })}
 							class="rounded-lg bg-blue-500 p-4 text-white"
 						>
 							Pause
 						</button>
-					{:else if state.match.state === 'PAUSED'}
+					{:else if data.game.timer.state === 'paused'}
 						<button
-							on:click={() =>
-								submitAction({
-									type: 'resume',
-									at: DateTime.now().toISO()
-								})}
+							on:click={() => submitAction({ type: 'resume' })}
 							class="rounded-lg bg-blue-500 p-4 text-white"
 						>
 							Resume
@@ -757,7 +754,7 @@
 			{/if}
 			{#if action == null}
 				<section class="mx-auto max-w-lg">
-					{#if state.match.state === 'RUNNING'}
+					{#if data.game.timer.state === 'running'}
 						<div class="flex flex-row items-baseline space-x-4">
 							<p class="font-bold">Action</p>
 							<p class="text-xl font-bold text-red-500">{error}</p>

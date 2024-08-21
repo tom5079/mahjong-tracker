@@ -64,6 +64,9 @@ export const POST = (async ({ params, request }) => {
                         index
                     }))
                 },
+                timer: {
+                    state: 'waiting'
+                },
                 actions: []
             }
         }))

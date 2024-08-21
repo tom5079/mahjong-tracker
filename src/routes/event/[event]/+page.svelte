@@ -138,7 +138,7 @@
 					<p class="flex flex-row items-center font-semibold">
 						{#if state.ok}
 							{@const match = state.value.match}
-							{#if match.state === 'WAITING'}
+							{#if game.timer.state === 'waiting'}
 								Scheduled{#if game.startTime}
 									{` at ${new Date(game.startTime).toLocaleString()}`}
 								{/if}
@@ -160,7 +160,7 @@
 					</p>
 
 					{#if state.ok}
-						<div class="grid-cols-gamescore mt-4 grid text-lg">
+						<div class="mt-4 grid grid-cols-gamescore text-lg">
 							{#each state.value.players.sort((a, b) => {
 								const match = state.value.match
 								if (match.state === 'ENDED') {
@@ -194,7 +194,7 @@
 											</span>
 										</td>
 									{/if}
-								{:else if state.value.match.state !== 'WAITING'}
+								{:else if game.timer.state !== 'waiting'}
 									{@const score = state.value.players.find(
 										(p) => p.user.id === player.user.id
 									)?.score}
@@ -212,6 +212,8 @@
 											</span>
 										</td>
 									{/if}
+								{:else}
+									<p />
 								{/if}
 							{/each}
 						</div>

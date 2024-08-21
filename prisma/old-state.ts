@@ -1,12 +1,24 @@
-import { wrapCatching } from "$lib/result"
+import { wrapCatching } from "../src/lib/result"
 import type { Ruleset, User } from "@prisma/client"
+import { DateTime, Duration } from "luxon"
 
 export type State = {
     round: number
     match: {
+        state: 'WAITING'
+    } | {
         state: 'RUNNING'
+        startedAt: DateTime<true>
+        pausedBy: Duration
+    } | {
+        state: 'PAUSED'
+        startedAt: DateTime<true>
+        pausedBy: Duration
+        pausedAt: DateTime<true>
     } | {
         state: 'ENDED'
+        startedAt: DateTime<true>
+        endedAt: DateTime<true>
         result: {
             player: string
             soten: number
@@ -50,7 +62,7 @@ export function canPassDealership(
     { ruleset, state, actions }: {
         ruleset: Ruleset,
         state: State,
-        actions: PrismaJson.Actions
+        actions: any
     }
 ): boolean {
     const dealer = state.players.find(it => it.wind === 0)
@@ -203,7 +215,7 @@ export const calculateTsumoPayment = (
     }
 }
 
-export const computeState = wrapCatching(({ user, players, ruleset, actions }: { user?: User | null, players: User[], ruleset: Ruleset, actions: PrismaJson.Actions }): State => {
+export const computeState = wrapCatching(({ user, players, ruleset, actions }: { user?: User | null, players: User[], ruleset: Ruleset, actions: any }): State => {
     switch (ruleset.player) {
         case 'FOUR':
             if (players.length !== 4) {
@@ -224,7 +236,7 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
     const state: State = {
         round: 0,
         match: {
-            state: 'RUNNING'
+            state: 'WAITING'
         },
         richi: 0,
         repeat: 0,
@@ -243,7 +255,72 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
             throw new Error('Game has already ended')
         }
 
+        if (state.match.state === 'WAITING' && action.type !== 'start') {
+            throw new Error('Game is not running')
+        }
+
         switch (action.type) {
+            case 'start': {
+                if (state.match.state !== 'WAITING') {
+                    throw new Error('Game is already running')
+                }
+
+                const at = DateTime.fromISO(action.at)
+
+                if (!at.isValid) {
+                    throw new Error('Invalid time')
+                }
+
+                state.match = {
+                    state: 'RUNNING',
+                    startedAt: at,
+                    pausedBy: Duration.fromMillis(0)
+                }
+
+                break
+            }
+            case 'pause': {
+                if (state.match.state !== 'RUNNING') {
+                    throw new Error('Game is not running')
+                }
+
+                const at = DateTime.fromISO(action.at)
+
+                if (!at.isValid) {
+                    throw new Error('Invalid time')
+                }
+
+                state.match = {
+                    state: 'PAUSED',
+                    startedAt: state.match.startedAt,
+                    pausedBy: state.match.pausedBy,
+                    pausedAt: at
+                }
+
+                break
+            }
+            case 'resume': {
+                if (state.match.state !== 'PAUSED') {
+                    throw new Error('Game is not paused')
+                }
+
+                const at = DateTime.fromISO(action.at)
+
+                if (!at.isValid) {
+                    throw new Error('Invalid time')
+                }
+
+                const pausedBy = state.match.pausedBy
+                    .plus(at.diff(state.match.pausedAt))
+
+                state.match = {
+                    state: 'RUNNING',
+                    startedAt: state.match.startedAt,
+                    pausedBy
+                }
+
+                break
+            }
             case 'riichi': {
                 const player = state.players.find(x => x.user.id === action.player)
 
@@ -637,6 +714,10 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
                 state.richi = 0
             }
 
+            if (state.match.state === 'WAITING') {
+                throw new Error('Cannot end game before starting')
+            }
+
             let uma: [number, number, number, number]
             if (ruleset.uma.type === 'simple') {
                 uma = ruleset.uma.uma
@@ -657,7 +738,9 @@ export const computeState = wrapCatching(({ user, players, ruleset, actions }: {
             }
             state.match = {
                 state: 'ENDED',
-                result: state.players.toSorted((a, b) => b.score - a.score).map((player, i) => ({
+                startedAt: state.match.startedAt,
+                endedAt: DateTime.now(),
+                result: [...state.players].sort((a, b) => b.score - a.score).map((player, i) => ({
                     player: player.user.id,
                     soten: Math.round((player.score
                         - ruleset.returnScore

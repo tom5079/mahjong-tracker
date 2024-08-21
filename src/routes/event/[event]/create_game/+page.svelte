@@ -214,8 +214,8 @@
 						{/each}
 					</ol>
 				</Fieldset>
-				<div class="flex flex-row pt-4">
-					<p class="ml-auto text-red-500">{error}</p>
+				<div class="flex flex-row items-center pt-4">
+					<p class="ml-auto font-bold text-red-500">{error}</p>
 					<button on:click={() => window.history.back()} class="p-4 font-semibold" type="button"
 						>Cancel</button
 					>

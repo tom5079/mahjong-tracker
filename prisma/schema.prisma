@@ -81,6 +81,8 @@ model Game {
   players         GamePlayer[]
   /// [Actions]
   actions         Json
+  /// [Timer]
+  timer           Json
   event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId         Int
 }

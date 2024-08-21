@@ -51,6 +51,34 @@ declare global {
 			until?: string
 		}
 
+		type Timer = {
+			state: 'waiting'
+		} | {
+			state: 'running'
+			startedAt: string
+			pausedBy: string
+		} | {
+			state: 'paused'
+			startedAt: string
+			pausedAt: string
+			pausedBy: string
+		} | {
+			state: 'ended'
+			startedAt: string
+			pausedBy: string
+			endedAt: string
+		}
+
+		type TimerAction = {
+			type: 'start'
+		} | {
+			type: 'pause'
+		} | {
+			type: 'resume'
+		} | {
+			type: 'end'
+		}
+
 		type Action = {
 			type: 'ron'
 			loser: string
@@ -74,18 +102,9 @@ declare global {
 			type: 'riichi',
 			player: string
 		} | {
-			type: 'start',
-			at: string
-		} | {
-			type: 'pause',
-			at: string
-		} | {
-			type: 'resume',
-			at: string
-		} | {
-			type: 'end',
-			at: string
+			type: 'end'
 		}
+
 		type Actions = Action[]
 	}
 }
