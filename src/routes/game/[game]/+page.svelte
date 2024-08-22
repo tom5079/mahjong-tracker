@@ -80,7 +80,7 @@
 	let displayArrow: ('U' | 'D' | null)[] = Array(10).fill(null)
 	let displayPoint: number[] = Array(10).fill(0)
 
-	let timeLeft: Duration | null = null
+	let timer: Duration | null = Duration.fromMillis(0)
 	let timeLeftToStart: Duration | null = null
 
 	const historyActions = {
@@ -91,11 +91,7 @@
 	}
 
 	onMount(() => {
-		if (!data.game.durationSeconds) {
-			return
-		}
-
-		const timer = setInterval(() => {
+		const timerUpdateInterval = setInterval(() => {
 			switch (data.game.timer.state) {
 				case 'waiting': {
 					const startTime = data.game.startTime
@@ -106,27 +102,31 @@
 					break
 				}
 				case 'running': {
-					timeLeft = DateTime.fromISO(data.game.timer.startedAt)
-						.plus({ seconds: data.game.durationSeconds })
-						.plus(Duration.fromISO(data.game.timer.pausedBy))
-						.diffNow()
+					if (data.game.durationSeconds) {
+						timer = DateTime.fromISO(data.game.timer.startedAt)
+							.plus({ seconds: data.game.durationSeconds })
+							.plus(Duration.fromISO(data.game.timer.pausedBy))
+							.diffNow()
+					} else {
+						timer = DateTime.now().diff(DateTime.fromISO(data.game.timer.startedAt))
+					}
 					break
 				}
 				case 'paused': {
-					timeLeft = DateTime.fromISO(data.game.timer.startedAt)
+					timer = DateTime.fromISO(data.game.timer.startedAt)
 						.plus({ seconds: data.game.durationSeconds })
 						.plus(Duration.fromISO(data.game.timer.pausedBy))
 						.diff(DateTime.fromISO(data.game.timer.pausedAt))
 					break
 				}
 				default: {
-					timeLeft = null
+					timer = null
 					break
 				}
 			}
 		}, 200)
 
-		return () => clearInterval(timer)
+		return () => clearInterval(timerUpdateInterval)
 	})
 
 	function displayRon() {
@@ -730,12 +730,12 @@
 				</button>
 			</div>
 		{:else}
-			{#if timeLeft}
+			{#if timer}
 				<div class="my-4 flex w-full flex-row items-center justify-between rounded-lg border p-8">
 					<p class="text-2xl font-bold">
-						{#if timeLeft.toMillis() > 0}{timeLeft.toFormat('hh:mm:ss')}{:else}Last Round{/if}
+						{#if timer.toMillis() > 0}{timer.toFormat('hh:mm:ss')}{:else}Last Round{/if}
 					</p>
-					{#if data.game.timer.state === 'running'}
+					{#if data.game.timer.state === 'running' && data.game.durationSeconds}
 						<button
 							on:click={() => submitAction({ type: 'pause' })}
 							class="rounded-lg bg-blue-500 p-4 text-white"
