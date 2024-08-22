@@ -80,7 +80,7 @@ export function sanitizeAction(action: any): PrismaJson.Action | null {
 
     switch (action.type) {
         case 'end':
-            if (typeof action.at !== 'string' || !DateTime.fromISO(action.at).isValid) {
+            if (typeof action.at !== 'string') {
                 return null
             }
             return { type: 'end' }
