@@ -56,8 +56,8 @@ function checkObjectSN(object: any, max: number | undefined = undefined): object
         && (max == null || Object.entries(object).length <= max)
 }
 
-function checkArrayN(array: any, max: number | undefined): array is number[] {
-    return array != null && Array.isArray(array) && array.every((x) => typeof x === 'number')
+function checkArrayS(array: any, max: number | undefined): array is string[] {
+    return array != null && Array.isArray(array) && array.every((x) => typeof x === 'string')
         && (max == null || array.length <= max)
 }
 
@@ -111,7 +111,8 @@ export function sanitizeAction(action: any): PrismaJson.Action | null {
 
             return { type: 'tsumo', winner: action.winner, scores: action.scores }
         case 'draw':
-            if (!checkArrayN(action.tenpai, 4)) {
+            console.log(action.tenpai)
+            if (!checkArrayS(action.tenpai, 4)) {
                 return null
             }
 
@@ -123,7 +124,7 @@ export function sanitizeAction(action: any): PrismaJson.Action | null {
 
             return { type: 'chonbo', player: action.player }
         case 'nagashi':
-            if (!checkArrayN(action.players, 4)) {
+            if (!checkArrayS(action.players, 4)) {
                 return null
             }
 
