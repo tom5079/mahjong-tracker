@@ -495,7 +495,13 @@
 	}
 
 	function draw() {
-		action = { type: 'draw', tenpai: [] }
+		action = {
+			type: 'draw',
+			tenpai: [
+				...(state?.players.filter((player) => player.richi).map((player) => player.user.id) ?? [])
+			]
+		}
+		console.log(action)
 	}
 
 	function chonbo() {
