@@ -501,7 +501,6 @@
 				...(state?.players.filter((player) => player.richi).map((player) => player.user.id) ?? [])
 			]
 		}
-		console.log(action)
 	}
 
 	function chonbo() {

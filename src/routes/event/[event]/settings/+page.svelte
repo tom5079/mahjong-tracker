@@ -9,7 +9,11 @@
 		<h1 class="text-2xl font-bold">{data.event.name} @ {data.event.parlor.name} Settings</h1>
 	</section>
 	<section class="m-4 divide-y rounded-xl border">
-		<a href="settings/member" class="flex flex-row items-center justify-between p-4">
+		<a href="settings/general" class="flex flex-row items-center justify-between p-6">
+			<h2 class="text-xl font-semibold">General</h2>
+			<span class="material-symbols-rounded my-auto">chevron_right</span>
+		</a>
+		<a href="settings/member" class="flex flex-row items-center justify-between p-6">
 			<h2 class="text-xl font-semibold">Member</h2>
 			<span class="material-symbols-rounded my-auto">chevron_right</span>
 		</a>
