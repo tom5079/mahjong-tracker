@@ -38,6 +38,11 @@
 			<li>
 				<a on:click={close} href="/parlor" class="flex items-center p-8"> Parlors </a>
 			</li>
+			{#if user}
+			<li>
+				<a on:click={close} href="/user/{user?.id}" class="flex items-center p-8"> Profile </a>
+			</li>
+			{/if}
 			<li data-sveltekit-preload-data="false">
 				{#if user}
 					<a data-sveltekit-reload href="/logout" class="flex items-center p-8">Logout</a>
