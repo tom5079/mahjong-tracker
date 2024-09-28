@@ -31,6 +31,8 @@
 				if (match.state !== 'ENDED') return acc
 
 				match.result.forEach((player) => {
+					if (acc[player.player] == null) return
+
 					acc[player.player][0] += player.soten - player.penalty
 					acc[player.player][1] += 1
 				})
