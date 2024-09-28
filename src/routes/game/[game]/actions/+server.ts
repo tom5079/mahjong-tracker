@@ -257,7 +257,7 @@ export const DELETE = (async ({ params, request }) => {
             error(400, 'No action to undo')
         }
 
-        if (actions[lastAction].type === 'end') {
+        if (actions[lastAction].type === 'end' || timer.state === 'ended') {
             if (timer.state !== 'ended') {
                 error(400, 'Invalid state')
             }
