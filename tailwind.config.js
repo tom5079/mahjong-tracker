@@ -8,7 +8,7 @@ export default {
 				mj: ['"LXGW WenKai Mono TC"']
 			},
 			gridTemplateColumns: {
-				leaderboard: 'auto minmax(0, 1fr) auto',
+				leaderboard: 'auto minmax(0, 1fr) auto auto',
 				gamescore: 'auto minmax(0, 1fr) auto'
 			}
 		}

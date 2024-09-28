@@ -8,6 +8,7 @@
 	import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 	import { onMount } from 'svelte'
 	import UserAvatar from '$lib/UserAvatar.svelte'
+	import PlayerScore from '$lib/game/player-score.svelte'
 
 	export let data: PageData
 
@@ -23,19 +24,21 @@
 	$: currentPage = +($page.url.searchParams.get('page') ?? 1)
 
 	$: leaderboard = Object.entries(
-		states.reduce<Record<string, number>>(
+		states.reduce<Record<string, [number, number]>>(
 			(acc, { state }) => {
 				if (!state.ok) return acc
 				const match = state.value.match
 				if (match.state !== 'ENDED') return acc
+
 				match.result.forEach((player) => {
-					acc[player.player] += player.soten - player.penalty
+					acc[player.player][0] += player.soten - player.penalty
+					acc[player.player][1] += 1
 				})
 				return acc
 			},
-			Object.fromEntries(data.attendees.map((attendee) => [attendee.userId, 0]))
+			Object.fromEntries(data.attendees.map((attendee) => [attendee.userId, [0, 0]]))
 		)
-	).sort((a, b) => b[1] - a[1])
+	).sort((a, b) => b[1][0] - a[1][0])
 
 	onMount(() => {
 		const refresh = setInterval(() => {
@@ -94,7 +97,8 @@
 				<th class="p-4 text-right text-lg">#</th>
 				<th class="p-4 text-left text-lg">Player</th>
 				<th class="p-4 text-right text-lg">Score</th>
-				{#each leaderboard as [player, score], i}
+				<th class="p-4 text-right text-lg">Games</th>
+				{#each leaderboard as [player, [score, games]], i}
 					{@const playerUser = data.attendees.find((p) => p.user.id === player)?.user}
 					{#if playerUser != null}
 						<td class="p-4 text-right text-lg">{i + 1}</td>
@@ -103,6 +107,7 @@
 							<span class="ml-4 truncate">{playerUser?.username}</span>
 						</td>
 						<td class="p-4 text-right text-lg">{score / 10}</td>
+						<td class="p-4 text-right text-lg">{games}</td>
 					{/if}
 				{/each}
 			</div>
