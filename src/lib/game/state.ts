@@ -188,7 +188,21 @@ export const calculateTsumoPayment = (
     payments: Record<string, number>,
     fromPot: number
 } => {
-    const player = ruleset.player === 'FOUR' ? 3 : 2
+    const manganScore = ruleset.scores.nonDealer.tsumo.find(([name]) => name === 'Mangan')
+
+    if (manganScore == null) {
+        throw new Error("Failed to check tsumozon")
+    }
+
+    const actualScore = manganScore[1]
+
+    if (Array.isArray(actualScore)) {
+        throw new Error("Failed to check tsumozon")
+    }
+
+    const tsumozon = actualScore.fromDealer === 4000
+
+    const player = ruleset.player === 'FOUR' || tsumozon ? 3 : 2
     const honba = state.repeat * ruleset.honba / player
     const pot = state.richi * 1000
 
