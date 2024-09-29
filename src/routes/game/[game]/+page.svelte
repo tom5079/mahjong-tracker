@@ -572,6 +572,7 @@
 			>
 				<PlayerScore {...state.players[2]} username={state.players[2].user.username} />
 			</button>
+			{#if state.players[3] != null}
 			<button
 				on:click={() => onPlayerClick(state.players[3].user)}
 				class="absolute left-2 top-1/2 max-w-[33%] -translate-y-1/2"
@@ -583,6 +584,7 @@
 			>
 				<PlayerScore {...state.players[3]} username={state.players[3].user.username} />
 			</button>
+			{/if}
 			<div
 				class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
 			>
@@ -635,7 +637,7 @@
 					/>
 				{/if}
 				<!-- 0 -> 3 -->
-				{#if displayArrow[2] != null}
+				{#if displayArrow[2] != null && data.game.event.ruleset.player === 'FOUR'}
 					<path
 						d="M 90 230
 			   Q 32 224 32 160"
@@ -656,7 +658,7 @@
 						marker-end={displayArrow[3] === 'U' ? 'url(#arrow)' : ''}
 					/>
 				{/if}
-				{#if displayArrow[4] != null}
+				{#if displayArrow[4] != null && data.game.event.ruleset.player === 'FOUR'}
 					<!-- 1 -> 3 -->
 					<path
 						d="M 200 100
@@ -667,7 +669,7 @@
 						marker-end={displayArrow[4] === 'U' ? 'url(#arrow)' : ''}
 					/>
 				{/if}
-				{#if displayArrow[5] != null}
+				{#if displayArrow[5] != null && data.game.event.ruleset.player === 'FOUR'}
 					<!-- 2 -> 3 -->
 					<path
 						d="M 100 32
@@ -847,12 +849,14 @@
 											(player) => player.user.id === history.result[2].player
 										)?.user?.username ?? 'unknown user'}
 									/>
+									{#if history.result[3] != null}
 									<HistoryEntry
 										{...history.result[3]}
 										username={state.players.find(
 											(player) => player.user.id === history.result[3].player
 										)?.user?.username ?? 'unknown user'}
 									/>
+									{/if}
 								</div>
 							</div>
 							<div class="my-4 h-px w-full bg-slate-300" />
