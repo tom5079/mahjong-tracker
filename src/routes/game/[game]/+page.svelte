@@ -637,7 +637,7 @@
 					/>
 				{/if}
 				<!-- 0 -> 3 -->
-				{#if displayArrow[2] != null}
+				{#if displayArrow[2] != null && data.game.event.ruleset.player === 'FOUR'}
 					<path
 						d="M 90 230
 			   Q 32 224 32 160"
@@ -658,7 +658,7 @@
 						marker-end={displayArrow[3] === 'U' ? 'url(#arrow)' : ''}
 					/>
 				{/if}
-				{#if displayArrow[4] != null}
+				{#if displayArrow[4] != null && data.game.event.ruleset.player === 'FOUR'}
 					<!-- 1 -> 3 -->
 					<path
 						d="M 200 100
@@ -669,7 +669,7 @@
 						marker-end={displayArrow[4] === 'U' ? 'url(#arrow)' : ''}
 					/>
 				{/if}
-				{#if displayArrow[5] != null}
+				{#if displayArrow[5] != null && data.game.event.ruleset.player === 'FOUR'}
 					<!-- 2 -> 3 -->
 					<path
 						d="M 100 32
