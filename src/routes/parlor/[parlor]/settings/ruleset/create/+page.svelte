@@ -23,6 +23,20 @@
 		uma: [10, 5, -5, -10]
 	}
 
+	const resetUma = (threePlayer: boolean) => {
+		if (threePlayer) {
+			uma = {
+				type: 'simple',
+				uma: [10, 0, -10, 0]
+			}
+		} else {
+			uma = {
+				type: 'simple',
+				uma: [10, 5, -5, -10]
+			}
+		}
+	}
+
 	let chonbo: PrismaJson.Chonbo = {
 		type: 'score',
 		name: 'Mangan',
@@ -36,6 +50,20 @@
 	}
 
 	$: formDataObject = (formData && Object.fromEntries([...formData.entries()])) ?? {}
+
+	$: {
+		const threePlayer = formData?.get('player') === 'three'
+
+		resetUma(threePlayer)
+
+		if (threePlayer) {
+			document.getElementById('honba')?.setAttribute('value', '1000')
+			document.getElementById('tenpai')?.setAttribute('value', '2000')
+		} else {
+			document.getElementById('honba')?.setAttribute('value', '300')
+			document.getElementById('tenpai')?.setAttribute('value', '3000')
+		}
+	}
 
 	function onNoteInput() {
 		textarea.style.height = ''
