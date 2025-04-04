@@ -23,6 +23,20 @@
 		uma: [10, 5, -5, -10]
 	}
 
+	const resetUma = (threePlayer: boolean) => {
+		if (threePlayer) {
+			uma = {
+				type: 'simple',
+				uma: [10, 0, -10, 0]
+			}
+		} else {
+			uma = {
+				type: 'simple',
+				uma: [10, 5, -5, -10]
+			}
+		}
+	}
+
 	let chonbo: PrismaJson.Chonbo = {
 		type: 'score',
 		name: 'Mangan',
@@ -31,11 +45,28 @@
 
 	let error = ''
 
+	let honba = 300
+	let tenpai = 3000
+
 	$: {
 		scoringSheet = generateScoringSheet(scoring)
 	}
 
 	$: formDataObject = (formData && Object.fromEntries([...formData.entries()])) ?? {}
+
+	$: {
+		const threePlayer = formData?.get('player') === 'three'
+
+		resetUma(threePlayer)
+
+		if (threePlayer) {
+			honba = 1000
+			tenpai = 2000
+		} else {
+			honba = 300
+			tenpai = 3000
+		}
+	}
 
 	function onNoteInput() {
 		textarea.style.height = ''
@@ -276,7 +307,7 @@
 						type="number"
 						id="honba"
 						name="honba"
-						value="300"
+						bind:value={honba}
 						step="100"
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
@@ -288,7 +319,7 @@
 						type="number"
 						id="tenpai"
 						name="tenpai"
-						value="3000"
+						bind:value={tenpai}
 						step="1000"
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
