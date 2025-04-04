@@ -45,6 +45,9 @@
 
 	let error = ''
 
+	let honba = 300
+	let tenpai = 3000
+
 	$: {
 		scoringSheet = generateScoringSheet(scoring)
 	}
@@ -57,11 +60,11 @@
 		resetUma(threePlayer)
 
 		if (threePlayer) {
-			document.getElementById('honba')?.setAttribute('value', '1000')
-			document.getElementById('tenpai')?.setAttribute('value', '2000')
+			honba = 1000
+			tenpai = 2000
 		} else {
-			document.getElementById('honba')?.setAttribute('value', '300')
-			document.getElementById('tenpai')?.setAttribute('value', '3000')
+			honba = 300
+			tenpai = 3000
 		}
 	}
 
@@ -304,7 +307,7 @@
 						type="number"
 						id="honba"
 						name="honba"
-						value="300"
+						bind:value={honba}
 						step="100"
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
@@ -316,7 +319,7 @@
 						type="number"
 						id="tenpai"
 						name="tenpai"
-						value="3000"
+						bind:value={tenpai}
 						step="1000"
 						class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
 					/>
