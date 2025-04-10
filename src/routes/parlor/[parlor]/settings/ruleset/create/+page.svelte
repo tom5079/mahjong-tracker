@@ -60,7 +60,7 @@
 		resetUma(threePlayer)
 
 		if (threePlayer) {
-			honba = 1000
+			honba = 1500
 			tenpai = 2000
 		} else {
 			honba = 300
