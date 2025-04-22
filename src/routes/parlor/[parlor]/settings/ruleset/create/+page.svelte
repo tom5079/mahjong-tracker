@@ -60,7 +60,11 @@
 		resetUma(threePlayer)
 
 		if (threePlayer) {
-			honba = 1500
+			if (!scoring.tsumozon) {
+				honba = 1000
+			} else {
+				honba = 1500
+			}
 			tenpai = 2000
 		} else {
 			honba = 300
