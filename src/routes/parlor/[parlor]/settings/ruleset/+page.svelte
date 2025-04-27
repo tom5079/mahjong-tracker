@@ -4,7 +4,7 @@
     export let data: PageData
 </script>
 
-<main class="p-4">
+<main class="mx-auto max-w-2xl p-4">
     <section class="mb-4 flex flex-row items-center justify-between pl-2">
         <h1 class="text-2xl font-bold">
             {data.parlor.name} Settings - Rulesets
