@@ -13,7 +13,7 @@
             window.grecaptcha
                 .execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
                 .then(async (token) => {
-                    await fetch(`/event/${data.event.id}/join`, {
+                    await fetch(`/event/${data.event.id}/settings/member/join`, {
                         method: 'POST',
                         body: JSON.stringify({
                             token,

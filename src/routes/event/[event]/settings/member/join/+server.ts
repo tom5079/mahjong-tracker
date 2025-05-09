@@ -1,11 +1,11 @@
-import { getSessionId } from '$lib/server/session'
-import { getUser } from '$lib/server/user'
 import { error, type RequestHandler } from '@sveltejs/kit'
 import prisma from '$lib/server/prisma'
 import { validateCaptcha } from '$lib/server/captcha'
 
-export const POST = (async ({ cookies, params, request }) => {
-    const captchaToken = await request.text()
+export const POST = (async ({ params, request }) => {
+    const data = await request.json()
+    const userId = data.user
+    const captchaToken = data.token
 
     if (!validateCaptcha(captchaToken)) {
         error(400, 'Invalid captcha token')
@@ -17,13 +17,6 @@ export const POST = (async ({ cookies, params, request }) => {
         error(404, 'Event not found')
     }
 
-    const sessionId = getSessionId(cookies)
-    const user = await getUser(sessionId)
-
-    if (user == null) {
-        error(401, 'Unauthorized')
-    }
-
     const event = await prisma.event.findUnique({
         where: {
             id: eventID,
@@ -32,6 +25,16 @@ export const POST = (async ({ cookies, params, request }) => {
 
     if (event == null) {
         error(404, 'Event not found')
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+    })
+
+    if (user == null) {
+        error(404, 'User not found')
     }
 
     await prisma.eventAttendee.upsert({

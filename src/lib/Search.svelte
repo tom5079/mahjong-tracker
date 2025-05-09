@@ -70,6 +70,8 @@
                 >
                     <p>Add guest {query}</p>
                 </button>
+            {:else}
+                <p>No result</p>
             {/if}
         </div>
     </div>
