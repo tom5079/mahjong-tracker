@@ -3,7 +3,7 @@ import * as schema from './schema'
 
 export { schema }
 
-export const db = drizzle(process.env.DATABASE_URL!)
+export const db = drizzle(process.env.DATABASE_URL!, { logger: true })
 
 export function oneOrNull<T>(x: T[]): T | null {
     if (x.length !== 1) return null
