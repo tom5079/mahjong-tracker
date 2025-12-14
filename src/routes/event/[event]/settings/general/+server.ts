@@ -1,6 +1,7 @@
 import { validateCaptcha } from '$lib/server/captcha.js'
-import prisma from '$lib/server/prisma.js'
+import { db, schema } from '$lib/server/drizzle'
 import { error } from '@sveltejs/kit'
+import { eq } from 'drizzle-orm'
 
 export const DELETE = async ({ params, request }) => {
     const captchaToken = await request.text()
@@ -15,11 +16,7 @@ export const DELETE = async ({ params, request }) => {
         error(404, 'Event not found')
     }
 
-    await prisma.event.delete({
-        where: {
-            id: eventId,
-        },
-    })
+    await db.delete(schema.event).where(eq(schema.event.id, eventId))
 
     return new Response(null)
 }
