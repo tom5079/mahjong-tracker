@@ -16,11 +16,17 @@ function registerUser({
     username: string
     avatar: string | null
 }) {
-    return prisma.user.upsert({
-        where: { id },
-        update: { username, avatar },
-        create: { id, username, avatar },
-    })
+    return db
+        .insert(user)
+        .values({
+            id,
+            username,
+            avatar,
+        })
+        .onConflictDoUpdate({
+            target: user.id,
+            set: { username, avatar },
+        })
 }
 
 export async function getUser(sessionId: string): Promise<User | null> {
@@ -34,7 +40,12 @@ export async function getUser(sessionId: string): Promise<User | null> {
 }
 
 export async function getUserById(userId: string) {
-    return prisma.user.findUnique({ where: { id: userId } })
+    return db
+        .select({ ...getTableColumns(user) })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1)
+        .then(oneOrNull)
 }
 
 export async function getAllUsers(): Promise<User[]> {
