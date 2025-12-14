@@ -57,7 +57,7 @@
                 .then(async (token) => {
                     await fetch(`${data.event.id}/join`, {
                         method: 'POST',
-                        body: token,
+                        body: JSON.stringify({ token }),
                     })
                     invalidateAll()
                 })
