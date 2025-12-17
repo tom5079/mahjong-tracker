@@ -1,3 +1,4 @@
+import type { UserId } from '$lib/types/user'
 import prisma from './prisma'
 import { getUserById } from './user'
 
@@ -30,7 +31,7 @@ export async function listParlors() {
         (await prisma.parlor.findMany()).map(async (parlor) => {
             return {
                 ...parlor,
-                ownerInfo: await getUserById(parlor.owner),
+                ownerInfo: await getUserById(parlor.owner as UserId),
             }
         })
     )
@@ -45,6 +46,6 @@ export async function getParlor(id: number) {
 
     return {
         ...parlor,
-        ownerInfo: await getUserById(parlor.owner),
+        ownerInfo: await getUserById(parlor.owner as UserId),
     }
 }
