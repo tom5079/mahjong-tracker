@@ -1,21 +1,14 @@
 import { refreshToken } from './discord'
 import prisma from './prisma'
-import { db, oneOrNull, type User } from './drizzle'
+import { db, oneOrNull } from './drizzle'
 import { user, userToken } from './drizzle/schema'
 import { eq, getTableColumns } from 'drizzle-orm'
 import { v5 as uuidv5 } from 'uuid'
+import type { User, UserId } from '$lib/types/user'
 
 const NAMESPACE_GUEST = 'e17fa822-f705-43fc-beaa-dcd14e13c4e0'
 
-function registerUser({
-    id,
-    username,
-    avatar,
-}: {
-    id: string
-    username: string
-    avatar: string | null
-}) {
+function registerUser({ id, username, avatar }: User) {
     return db
         .insert(user)
         .values({
@@ -39,17 +32,13 @@ export async function getUser(sessionId: string): Promise<User | null> {
         .then(oneOrNull)
 }
 
-export async function getUserById(userId: string) {
+export async function getUserById(userId: UserId) {
     return db
         .select({ ...getTableColumns(user) })
         .from(user)
         .where(eq(user.id, userId))
         .limit(1)
         .then(oneOrNull)
-}
-
-export async function getAllUsers(): Promise<User[]> {
-    return await prisma.user.findMany()
 }
 
 export async function registerUserToken({
