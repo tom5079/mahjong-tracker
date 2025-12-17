@@ -1,6 +1,5 @@
 import {
     pgTable,
-    varchar,
     timestamp,
     text,
     integer,
@@ -11,7 +10,7 @@ import {
     primaryKey,
     pgEnum,
 } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
+import { type UserId } from '$lib/types/user'
 
 export const allLastPolicy = pgEnum('AllLastPolicy', ['AGARIYAME', 'TENPAIYAME', 'NONE'])
 export const endgamePolicy = pgEnum('EndgamePolicy', ['DISAPPEARS', 'TOP'])
@@ -85,7 +84,7 @@ export const event = pgTable(
 )
 
 export const user = pgTable('User', {
-    id: text().primaryKey().notNull(),
+    id: text().$type<UserId>().primaryKey().notNull(),
     avatar: text(),
     username: text().notNull(),
 })

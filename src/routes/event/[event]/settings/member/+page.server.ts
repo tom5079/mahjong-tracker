@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import prisma from '$lib/server/prisma'
-import { getAllUsers } from '$lib/server/user'
 
 export const load = (async ({ params }) => {
     const eventId = +(params.event ?? NaN)
@@ -11,7 +10,6 @@ export const load = (async ({ params }) => {
     }
 
     return {
-        users: await getAllUsers(),
         attendee: await prisma.eventAttendee.findMany({
             where: {
                 eventId,

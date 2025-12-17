@@ -2,15 +2,9 @@
     import '../app.css'
 
     import Navbar from '$lib/Navbar.svelte'
-    import type { PageData } from './$types'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
-    interface Props {
-        data: PageData;
-        children?: import('svelte').Snippet;
-    }
-
-    let { data, children }: Props = $props();
+    let { data, children } = $props()
 </script>
 
 <svelte:head>
@@ -20,4 +14,4 @@
 </svelte:head>
 
 <Navbar user={data.user} />
-{@render children?.()}
+{@render children()}

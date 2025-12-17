@@ -3,14 +3,13 @@
     import type { PageData } from './$types'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
     import UserAvatar from '$lib/UserAvatar.svelte'
-    import Search from '$lib/Search.svelte'
-    import type { EventAttendee, User } from '@prisma/client'
+    import Search from './Search.svelte'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 
     export async function join(user: string) {
         window.grecaptcha.ready(() => {
@@ -59,7 +58,7 @@
     </section>
     <section class="p-4">
         <h2 class="text-xl font-semibold">Add Player</h2>
-        <Search usersList={data.users} attendees={data.attendee} {join} />
+        <Search {join} />
     </section>
     <section>
         <h2 class="p-4 text-xl font-semibold">

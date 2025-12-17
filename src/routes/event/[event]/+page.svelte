@@ -103,20 +103,20 @@ https://svelte.dev/e/node_invalid_placement -->
         <div class="flex flex-col space-y-4">
             <h2 class="text-xl font-semibold">Leaderboard</h2>
             <div class="grid grid-cols-leaderboard rounded-lg border">
-                <th class="p-4 text-right text-lg">#</th>
-                <th class="p-4 text-left text-lg">Player</th>
-                <th class="p-4 text-right text-lg">Score</th>
-                <th class="p-4 text-right text-lg">Games</th>
+                <div class="p-4 text-right text-lg">#</div>
+                <div class="p-4 text-left text-lg">Player</div>
+                <div class="p-4 text-right text-lg">Score</div>
+                <div class="p-4 text-right text-lg">Games</div>
                 {#each leaderboard as [player, [score, games]], i}
                     {@const playerUser = data.attendees.find((p) => p.user.id === player)?.user}
                     {#if playerUser != null}
-                        <td class="p-4 text-right text-lg">{i + 1}</td>
-                        <td class="flex flex-row items-center p-4 text-lg">
+                        <div class="p-4 text-right text-lg">{i + 1}</div>
+                        <div class="flex flex-row items-center p-4 text-lg">
                             <UserAvatar user={playerUser} />
                             <span class="ml-4 truncate">{playerUser?.username}</span>
-                        </td>
-                        <td class="p-4 text-right text-lg">{score / 10}</td>
-                        <td class="p-4 text-right text-lg">{games}</td>
+                        </div>
+                        <div class="p-4 text-right text-lg">{score / 10}</div>
+                        <div class="p-4 text-right text-lg">{games}</div>
                     {/if}
                 {/each}
             </div>
