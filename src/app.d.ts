@@ -97,6 +97,10 @@ declare global {
 
         type Action =
             | {
+                  type: 'start'
+                  at: string
+              }
+            | {
                   type: 'ron'
                   loser: string
                   scores: Record<string, number>
