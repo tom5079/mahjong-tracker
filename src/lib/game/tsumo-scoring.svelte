@@ -1,21 +1,25 @@
 <script lang="ts">
-    export let scores: PrismaJson.Score['dealer']
-    export let onScore: (score: { fromDealer: number; fromNonDealer: number }) => void
+    interface Props {
+        scores: PrismaJson.Score['dealer'];
+        onScore: (score: { fromDealer: number; fromNonDealer: number }) => void;
+    }
 
-    let category = [scores.tsumo]
+    let { scores, onScore }: Props = $props();
+
+    let category = $state([scores.tsumo])
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4">
     {#each category[0] as [name, score]}
         {#if Array.isArray(score)}
             <button
-                on:click={() => {
+                onclick={() => {
                     category = [score, ...category]
                 }}
                 class="rounded border p-8 text-xl font-bold">{name}</button
             >
         {:else}
-            <button on:click={() => onScore(score)} class="rounded border p-8 text-xl font-bold"
+            <button onclick={() => onScore(score)} class="rounded border p-8 text-xl font-bold"
                 >{name}</button
             >
         {/if}

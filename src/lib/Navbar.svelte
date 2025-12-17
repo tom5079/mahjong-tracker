@@ -3,8 +3,12 @@
     import { fade } from 'svelte/transition'
     import UserAvatar from './UserAvatar.svelte'
 
-    export let user: User | null = null
-    let menuOpened = false
+    interface Props {
+        user?: User | null;
+    }
+
+    let { user = null }: Props = $props();
+    let menuOpened = $state(false)
 
     function close() {
         menuOpened = false
@@ -16,7 +20,7 @@
 
     <div class="flex flex-row space-x-8 p-2">
         {#if user != null}
-            <button on:click={() => (menuOpened = !menuOpened)}>
+            <button onclick={() => (menuOpened = !menuOpened)}>
                 <UserAvatar {user} size="lg" />
             </button>
         {:else}
@@ -34,7 +38,7 @@
     >
         <ul class="border-t text-2xl font-medium">
             <li>
-                <a on:click={close} href="/parlor" class="flex items-center p-8"> Parlors </a>
+                <a onclick={close} href="/parlor" class="flex items-center p-8"> Parlors </a>
             </li>
             <li data-sveltekit-preload-data="false">
                 {#if user}

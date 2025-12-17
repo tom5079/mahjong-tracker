@@ -5,7 +5,12 @@
     import type { PageData } from './$types'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+        children?: import('svelte').Snippet;
+    }
+
+    let { data, children }: Props = $props();
 </script>
 
 <svelte:head>
@@ -15,4 +20,4 @@
 </svelte:head>
 
 <Navbar user={data.user} />
-<slot />
+{@render children?.()}

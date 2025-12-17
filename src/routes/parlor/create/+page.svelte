@@ -3,13 +3,13 @@
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
     import { onMount } from 'svelte'
 
-    let loading = false
-    let error = ''
+    let loading = $state(false)
+    let error = $state('')
 
-    let tags = ''
-    let textarea: HTMLTextAreaElement
+    let tags = $state('')
+    let textarea: HTMLTextAreaElement = $state()
 
-    let form: HTMLFormElement
+    let form: HTMLFormElement = $state()
 
     function onTagInput() {
         textarea.style.height = ''
@@ -102,19 +102,19 @@
                 <textarea
                     bind:value={tags}
                     bind:this={textarea}
-                    on:input={onTagInput}
+                    oninput={onTagInput}
                     class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     rows="1"
                     id="tags"
                     name="tags"
-                />
+></textarea>
             </div>
         </div>
         <div class="flex flex-row items-center justify-end space-x-4 px-4">
             <p class="font-semibold tracking-tight text-red-500">{error}</p>
             <button
                 type="button"
-                on:click={() => window.history.back()}
+                onclick={() => window.history.back()}
                 class="px-5 py-2.5 font-semibold">Cancel</button
             >
             <button

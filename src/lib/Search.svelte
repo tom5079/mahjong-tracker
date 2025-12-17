@@ -2,11 +2,15 @@
     import type { EventAttendee, User } from '@prisma/client'
     import UserAvatar from './UserAvatar.svelte'
 
-    export let usersList: User[]
-    export let attendees: EventAttendee[]
-    export let join: (user: string) => Promise<void>
+    interface Props {
+        usersList: User[]
+        attendees: EventAttendee[]
+        join: (user: string) => Promise<void>
+    }
 
-    let query: string = ''
+    let { usersList, attendees, join }: Props = $props()
+
+    let query: string = $state('')
 
     function search(query: string): User[] {
         return usersList.filter((user) => {
@@ -20,7 +24,7 @@
         })
     }
 
-    $: searchResult = search(query)
+    let searchResult = $derived(search(query))
 
     async function addGuest(username: string) {
         const response = await fetch('/api/register_guest', {
@@ -45,7 +49,7 @@
             bind:value={query}
             placeholder="Search or add by Discord username"
             class="peer w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            on:focus={() => {
+            onfocus={() => {
                 searchResult = search(query)
             }}
         />
@@ -55,7 +59,7 @@
             {#if searchResult.length > 0}
                 {#each searchResult as user}
                     <button
-                        on:mousedown={() => join(user.id)}
+                        onmousedown={() => join(user.id)}
                         class="flex flex-row items-center space-x-2 py-4"
                     >
                         <UserAvatar {user} />
@@ -64,10 +68,7 @@
                 {/each}
             {/if}
             {#if query.length > 0 && !usersList.some((user) => user.username === query)}
-                <button
-                    on:mousedown={handleGuest}
-                    class="flex flex-row items-center space-x-2 py-4"
-                >
+                <button onmousedown={handleGuest} class="flex flex-row items-center space-x-2 py-4">
                     <p>Add guest {query}</p>
                 </button>
             {/if}

@@ -1,7 +1,11 @@
 <script lang="ts">
-    export let name: string
-    export let label: string
-    export let required: boolean | undefined = undefined
+    interface Props {
+        name: string;
+        label: string;
+        required?: boolean | undefined;
+    }
+
+    let { name, label, required = undefined }: Props = $props();
 </script>
 
 <label class="flex flex-col space-y-2">

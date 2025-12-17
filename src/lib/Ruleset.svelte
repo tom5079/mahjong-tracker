@@ -1,16 +1,20 @@
 <script lang="ts">
     import type { Ruleset } from '@prisma/client'
 
-    export let ruleset: Ruleset
-    export let readonly: boolean = false
+    interface Props {
+        ruleset: Ruleset;
+        readonly?: boolean;
+    }
 
-    let textarea: HTMLTextAreaElement
+    let { ruleset = $bindable(), readonly = false }: Props = $props();
+
+    let textarea: HTMLTextAreaElement = $state()
 
     let scoring: {
         kiriage: boolean
         fixed30fu: boolean
         tsumozon: boolean
-    } = { kiriage: true, fixed30fu: false, tsumozon: true }
+    } = $state({ kiriage: true, fixed30fu: false, tsumozon: true })
 
     function onNoteInput() {
         textarea.style.height = ''
@@ -86,7 +90,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.player === 'FOUR'}
                 class:text-white={ruleset.player === 'FOUR'}
-                on:click={four}
+                onclick={four}
             >
                 4 Players
             </button>
@@ -94,7 +98,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.player === 'THREE'}
                 class:text-white={ruleset.player === 'THREE'}
-                on:click={three}
+                onclick={three}
             >
                 3 Players
             </button>
@@ -104,7 +108,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.length === 'HANCHAN'}
                 class:text-white={ruleset.length === 'HANCHAN'}
-                on:click={() => (ruleset.length = readonly ? ruleset.length : 'HANCHAN')}
+                onclick={() => (ruleset.length = readonly ? ruleset.length : 'HANCHAN')}
             >
                 Hanchan
             </button>
@@ -112,7 +116,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.length === 'TONPU'}
                 class:text-white={ruleset.length === 'TONPU'}
-                on:click={() => (ruleset.length = readonly ? ruleset.length : 'TONPU')}
+                onclick={() => (ruleset.length = readonly ? ruleset.length : 'TONPU')}
             >
                 East only
             </button>
@@ -147,7 +151,7 @@
         <legend class="block text-sm font-medium text-gray-900">Uma</legend>
         <button
             type="button"
-            on:click={() => {
+            onclick={() => {
                 if (ruleset.uma.type === 'simple') {
                     ruleset.uma =
                         ruleset.player === 'THREE'
@@ -170,7 +174,7 @@
                 class:after:translate-x-full={ruleset.uma.type === 'floating'}
                 class:after:border-white={ruleset.uma.type === 'floating'}
                 class:rtl:after:-translate-x-full={ruleset.uma.type === 'floating'}
-            />
+></div>
         </button>
         {#if ruleset.uma.type === 'simple'}
             <div class="flex flex-row items-center space-x-2">
@@ -260,7 +264,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.endgamePot === 'TOP'}
                 class:text-white={ruleset.endgamePot === 'TOP'}
-                on:click={() => (ruleset.endgamePot = readonly ? ruleset.endgamePot : 'TOP')}
+                onclick={() => (ruleset.endgamePot = readonly ? ruleset.endgamePot : 'TOP')}
             >
                 Top
             </button>
@@ -268,7 +272,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.endgamePot === 'DISAPPEARS'}
                 class:text-white={ruleset.endgamePot === 'DISAPPEARS'}
-                on:click={() => (ruleset.endgamePot = readonly ? ruleset.endgamePot : 'DISAPPEARS')}
+                onclick={() => (ruleset.endgamePot = readonly ? ruleset.endgamePot : 'DISAPPEARS')}
             >
                 Disappears
             </button>
@@ -281,7 +285,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.tiebreaker === 'WIND'}
                 class:text-white={ruleset.tiebreaker === 'WIND'}
-                on:click={() => (ruleset.tiebreaker = readonly ? ruleset.tiebreaker : 'WIND')}
+                onclick={() => (ruleset.tiebreaker = readonly ? ruleset.tiebreaker : 'WIND')}
             >
                 Wind
             </button>
@@ -289,7 +293,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.tiebreaker === 'SPLIT'}
                 class:text-white={ruleset.tiebreaker === 'SPLIT'}
-                on:click={() => (ruleset.tiebreaker = readonly ? ruleset.tiebreaker : 'SPLIT')}
+                onclick={() => (ruleset.tiebreaker = readonly ? ruleset.tiebreaker : 'SPLIT')}
             >
                 Split
             </button>
@@ -302,7 +306,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.renchan === 'TENPAI'}
                 class:text-white={ruleset.renchan === 'TENPAI'}
-                on:click={() => (ruleset.renchan = readonly ? ruleset.renchan : 'TENPAI')}
+                onclick={() => (ruleset.renchan = readonly ? ruleset.renchan : 'TENPAI')}
             >
                 Tenpai
             </button>
@@ -310,7 +314,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.renchan === 'AGARI'}
                 class:text-white={ruleset.renchan === 'AGARI'}
-                on:click={() => (ruleset.renchan = readonly ? ruleset.renchan : 'AGARI')}
+                onclick={() => (ruleset.renchan = readonly ? ruleset.renchan : 'AGARI')}
             >
                 Agari
             </button>
@@ -318,7 +322,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.renchan === 'NONE'}
                 class:text-white={ruleset.renchan === 'NONE'}
-                on:click={() => (ruleset.renchan = readonly ? ruleset.renchan : 'NONE')}
+                onclick={() => (ruleset.renchan = readonly ? ruleset.renchan : 'NONE')}
             >
                 None
             </button>
@@ -326,7 +330,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.renchan === 'ALWAYS'}
                 class:text-white={ruleset.renchan === 'ALWAYS'}
-                on:click={() => (ruleset.renchan = readonly ? ruleset.renchan : 'ALWAYS')}
+                onclick={() => (ruleset.renchan = readonly ? ruleset.renchan : 'ALWAYS')}
             >
                 Always
             </button>
@@ -339,7 +343,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLast === 'AGARIYAME'}
                 class:text-white={ruleset.allLast === 'AGARIYAME'}
-                on:click={() => (ruleset.allLast = readonly ? ruleset.allLast : 'AGARIYAME')}
+                onclick={() => (ruleset.allLast = readonly ? ruleset.allLast : 'AGARIYAME')}
             >
                 Agariyame
             </button>
@@ -347,7 +351,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLast === 'TENPAIYAME'}
                 class:text-white={ruleset.allLast === 'TENPAIYAME'}
-                on:click={() => (ruleset.allLast = readonly ? ruleset.allLast : 'TENPAIYAME')}
+                onclick={() => (ruleset.allLast = readonly ? ruleset.allLast : 'TENPAIYAME')}
             >
                 Tenpaiyame
             </button>
@@ -355,7 +359,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLast === 'NONE'}
                 class:text-white={ruleset.allLast === 'NONE'}
-                on:click={() => (ruleset.allLast = readonly ? ruleset.allLast : 'NONE')}
+                onclick={() => (ruleset.allLast = readonly ? ruleset.allLast : 'NONE')}
             >
                 None
             </button>
@@ -365,7 +369,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLastPlacement === 1}
                 class:text-white={ruleset.allLastPlacement === 1}
-                on:click={() =>
+                onclick={() =>
                     (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 1)}
             >
                 1st
@@ -374,7 +378,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLastPlacement === 2}
                 class:text-white={ruleset.allLastPlacement === 2}
-                on:click={() =>
+                onclick={() =>
                     (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 2)}
             >
                 2st
@@ -384,7 +388,7 @@
                     class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                     class:bg-blue-500={ruleset.allLastPlacement === 3}
                     class:text-white={ruleset.allLastPlacement === 3}
-                    on:click={() =>
+                    onclick={() =>
                         (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 3)}
                 >
                     3st
@@ -394,7 +398,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLastPlacement == null}
                 class:text-white={ruleset.allLastPlacement == null}
-                on:click={() =>
+                onclick={() =>
                     (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : null)}
             >
                 Any
@@ -408,7 +412,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.doubleRon}
                 class:text-white={ruleset.doubleRon}
-                on:click={() =>
+                onclick={() =>
                     (ruleset.doubleRon = readonly ? ruleset.doubleRon : !ruleset.doubleRon)}
             >
                 Double
@@ -418,7 +422,7 @@
                     class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                     class:bg-blue-500={ruleset.tripleRon}
                     class:text-white={ruleset.tripleRon}
-                    on:click={() =>
+                    onclick={() =>
                         (ruleset.tripleRon = readonly ? ruleset.tripleRon : !ruleset.tripleRon)}
                 >
                     Triple
@@ -545,7 +549,7 @@
         </div>
         <button
             type="button"
-            on:click={() => (scoring = { ...scoring, kiriage: !scoring.kiriage })}
+            onclick={() => (scoring = { ...scoring, kiriage: !scoring.kiriage })}
             class="group flex w-full cursor-pointer items-center justify-between"
         >
             <span class="ms-3 text-sm font-medium text-gray-900">Kiriage</span>
@@ -556,11 +560,11 @@
                 class:after:translate-x-full={scoring.kiriage}
                 class:after:border-white={scoring.kiriage}
                 class:rtl:after:-translate-x-full={scoring.kiriage}
-            />
+></div>
         </button>
         <button
             type="button"
-            on:click={() => (scoring = { ...scoring, fixed30fu: !scoring.fixed30fu })}
+            onclick={() => (scoring = { ...scoring, fixed30fu: !scoring.fixed30fu })}
             class="group flex w-full cursor-pointer items-center justify-between"
         >
             <span class="ms-3 text-sm font-medium text-gray-900">Fixed 30 Fu</span>
@@ -571,12 +575,12 @@
                 class:after:translate-x-full={scoring.fixed30fu}
                 class:after:border-white={scoring.fixed30fu}
                 class:rtl:after:-translate-x-full={scoring.fixed30fu}
-            />
+></div>
         </button>
         {#if ruleset.player === 'THREE'}
             <button
                 type="button"
-                on:click={() => (scoring = { ...scoring, tsumozon: !scoring.tsumozon })}
+                onclick={() => (scoring = { ...scoring, tsumozon: !scoring.tsumozon })}
                 class="group flex w-full cursor-pointer items-center justify-between"
             >
                 <span class="ms-3 text-sm font-medium text-gray-900">Tsumozon</span>
@@ -587,7 +591,7 @@
                     class:after:translate-x-full={scoring.tsumozon}
                     class:after:border-white={scoring.tsumozon}
                     class:rtl:after:-translate-x-full={scoring.tsumozon}
-                />
+></div>
             </button>
         {/if}
     </fieldset>
@@ -611,7 +615,7 @@
         <span class="text-sm font-medium text-gray-900">Nagashi is tsumo</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-        />
+></div>
     </label>
 
     <fieldset class="space-y-2 rounded-lg border border-gray-300 px-2 pb-2">
@@ -620,7 +624,7 @@
             <div class="flex flex-row space-x-2">
                 <button
                     type="button"
-                    on:click={() => {
+                    onclick={() => {
                         ruleset.chonbo = {
                             type: 'score',
                             name: 'Mangan',
@@ -633,7 +637,7 @@
                 >
                 <button
                     type="button"
-                    on:click={() => {
+                    onclick={() => {
                         ruleset.chonbo = {
                             type: 'fixed',
                             point: 12000,
@@ -646,7 +650,7 @@
                 >
                 <button
                     type="button"
-                    on:click={() => {
+                    onclick={() => {
                         ruleset.chonbo = {
                             type: 'custom',
                             dealer: {
@@ -733,7 +737,7 @@
                 <span class="ms-3 text-sm font-medium text-gray-900">Chonbo affects score</span>
                 <div
                     class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                />
+></div>
             </label>
         </div>
     </fieldset>
@@ -743,7 +747,7 @@
         <span class="text-sm font-medium text-gray-900">Can give up dealership</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-        />
+></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center">
@@ -751,7 +755,7 @@
         <span class="text-sm font-medium text-gray-900">Tobi</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-        />
+></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center">
@@ -759,7 +763,7 @@
         <span class="text-sm font-medium text-gray-900">Tobi at Zero</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-        />
+></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center" class:hidden={ruleset.tobi}>
@@ -767,7 +771,7 @@
         <span class="text-sm font-medium text-gray-900">Riichi below 1000</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-        />
+></div>
     </label>
 
     <div class="flex w-full flex-col space-y-2">
@@ -776,7 +780,7 @@
             <span class="text-sm font-medium text-gray-900">Sudden Death</span>
             <div
                 class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-            />
+></div>
         </label>
 
         <input
@@ -796,7 +800,7 @@
             <span class="text-sm font-medium text-gray-900">Called Game</span>
             <div
                 class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-            />
+></div>
         </label>
 
         <input
@@ -814,11 +818,11 @@
         <textarea
             bind:value={ruleset.note}
             bind:this={textarea}
-            on:input={onNoteInput}
+            oninput={onNoteInput}
             class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             rows="1"
             id="note"
             name="note"
-        />
+></textarea>
     </div>
 </div>

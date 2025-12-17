@@ -1,8 +1,12 @@
 <script lang="ts">
     import type { User } from '@prisma/client'
 
-    export let user: User | undefined
-    export let size: 'sm' | 'md' | 'lg' = 'md'
+    interface Props {
+        user: User | undefined;
+        size?: 'sm' | 'md' | 'lg';
+    }
+
+    let { user, size = 'md' }: Props = $props();
 
     const sizeToClassMap = {
         sm: 'w-4 h-4',

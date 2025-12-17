@@ -1,41 +1,43 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { type ScoringSheet, generateScoringSheet } from '$lib/scoring'
     import { onMount } from 'svelte'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
-    let form: HTMLFormElement
-    let formData: FormData | null
-    let formDataObject: { [key: string]: FormDataEntryValue }
+    let form: HTMLFormElement = $state()
+    let formData: FormData | null = $state()
+    let formDataObject: { [key: string]: FormDataEntryValue } = $derived((formData && Object.fromEntries([...formData.entries()])) ?? {})
 
-    let note: string
-    let textarea: HTMLTextAreaElement
+    let note: string = $state()
+    let textarea: HTMLTextAreaElement = $state()
 
     let scoring: {
         kiriage: boolean
         fixed30fu: boolean
         tsumozon: boolean
-    } = { kiriage: true, fixed30fu: false, tsumozon: true }
+    } = $state({ kiriage: true, fixed30fu: false, tsumozon: true })
 
-    let scoringSheet: ScoringSheet | null = null
+    let scoringSheet: ScoringSheet | null = $state(null)
 
-    let uma: PrismaJson.Uma = {
+    let uma: PrismaJson.Uma = $state({
         type: 'simple',
         uma: [10, 5, -5, -10],
-    }
+    })
 
-    let chonbo: PrismaJson.Chonbo = {
+    let chonbo: PrismaJson.Chonbo = $state({
         type: 'score',
         name: 'Mangan',
         affectsScore: true,
-    }
+    })
 
-    let error = ''
+    let error = $state('')
 
-    $: {
+    run(() => {
         scoringSheet = generateScoringSheet(scoring)
-    }
+    });
 
-    $: formDataObject = (formData && Object.fromEntries([...formData.entries()])) ?? {}
+    
 
     function onNoteInput() {
         textarea.style.height = ''
@@ -81,7 +83,7 @@
         <h1 class="text-2xl font-bold">Create new ruleset</h1>
     </section>
     <section>
-        <form bind:this={form} on:change={(_) => (formData = new FormData(form))}>
+        <form bind:this={form} onchange={(_) => (formData = new FormData(form))}>
             <div class="grid gap-6 py-4">
                 <div>
                     <label for="name" class="mb-2 block text-sm font-medium text-gray-900"
@@ -190,7 +192,7 @@
                     <legend class="block text-sm font-medium text-gray-900">Uma</legend>
                     <button
                         type="button"
-                        on:click={() => {
+                        onclick={() => {
                             if (uma.type === 'simple') {
                                 uma = {
                                     type: 'floating',
@@ -215,7 +217,7 @@
                             class:after:translate-x-full={uma.type === 'floating'}
                             class:after:border-white={uma.type === 'floating'}
                             class:rtl:after:-translate-x-full={uma.type === 'floating'}
-                        />
+></div>
                     </button>
                     {#if uma.type === 'simple'}
                         <div class="flex flex-row items-center space-x-2">
@@ -689,7 +691,7 @@
                     </div>
                     <button
                         type="button"
-                        on:click={() =>
+                        onclick={() =>
                             (scoring = {
                                 ...scoring,
                                 kiriage: !scoring.kiriage,
@@ -704,11 +706,11 @@
                             class:after:translate-x-full={scoring.kiriage}
                             class:after:border-white={scoring.kiriage}
                             class:rtl:after:-translate-x-full={scoring.kiriage}
-                        />
+></div>
                     </button>
                     <button
                         type="button"
-                        on:click={() =>
+                        onclick={() =>
                             (scoring = {
                                 ...scoring,
                                 fixed30fu: !scoring.fixed30fu,
@@ -723,12 +725,12 @@
                             class:after:translate-x-full={scoring.fixed30fu}
                             class:after:border-white={scoring.fixed30fu}
                             class:rtl:after:-translate-x-full={scoring.fixed30fu}
-                        />
+></div>
                     </button>
                     {#if formDataObject?.player === 'three'}
                         <button
                             type="button"
-                            on:click={() =>
+                            onclick={() =>
                                 (scoring = {
                                     ...scoring,
                                     tsumozon: !scoring.tsumozon,
@@ -743,7 +745,7 @@
                                 class:after:translate-x-full={scoring.tsumozon}
                                 class:after:border-white={scoring.tsumozon}
                                 class:rtl:after:-translate-x-full={scoring.tsumozon}
-                            />
+></div>
                         </button>
                     {/if}
                 </fieldset>
@@ -769,7 +771,7 @@
                     <span class="text-sm font-medium text-gray-900">Nagashi is tsumo</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                    />
+></div>
                 </label>
 
                 <fieldset class="space-y-2 rounded-lg border border-gray-300 px-2 pb-2">
@@ -778,7 +780,7 @@
                         <div class="flex flex-row space-x-2">
                             <button
                                 type="button"
-                                on:click={() => {
+                                onclick={() => {
                                     chonbo = {
                                         type: 'score',
                                         name: 'Mangan',
@@ -791,7 +793,7 @@
                             >
                             <button
                                 type="button"
-                                on:click={() => {
+                                onclick={() => {
                                     chonbo = {
                                         type: 'fixed',
                                         point: 12000,
@@ -804,7 +806,7 @@
                             >
                             <button
                                 type="button"
-                                on:click={() => {
+                                onclick={() => {
                                     chonbo = {
                                         type: 'custom',
                                         dealer: {
@@ -893,7 +895,7 @@
                             >
                             <div
                                 class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                            />
+></div>
                         </label>
                     </div>
                 </fieldset>
@@ -903,7 +905,7 @@
                     <span class="text-sm font-medium text-gray-900">Can give up dealership</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                    />
+></div>
                 </label>
 
                 <label class="inline-flex cursor-pointer items-center">
@@ -911,7 +913,7 @@
                     <span class="text-sm font-medium text-gray-900">Tobi</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                    />
+></div>
                 </label>
 
                 <label class="inline-flex cursor-pointer items-center">
@@ -919,7 +921,7 @@
                     <span class="text-sm font-medium text-gray-900">Tobi at Zero</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                    />
+></div>
                 </label>
 
                 <label
@@ -930,7 +932,7 @@
                     <span class="text-sm font-medium text-gray-900">Riichi below 1000</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                    />
+></div>
                 </label>
 
                 <div class="flex w-full flex-col space-y-2">
@@ -939,7 +941,7 @@
                         <span class="text-sm font-medium text-gray-900">Sudden Death</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                        />
+></div>
                     </label>
 
                     <input
@@ -959,7 +961,7 @@
                         <span class="text-sm font-medium text-gray-900">Called Game</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-                        />
+></div>
                     </label>
 
                     <input
@@ -979,12 +981,12 @@
                     <textarea
                         bind:value={note}
                         bind:this={textarea}
-                        on:input={onNoteInput}
+                        oninput={onNoteInput}
                         class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                         rows="1"
                         id="note"
                         name="note"
-                    />
+></textarea>
                 </div>
             </div>
             <div class="flex flex-row items-center space-x-4">

@@ -2,7 +2,11 @@
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
     import type { PageData } from './$types'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
 
     function deleteGame() {
         window.grecaptcha.ready(() => {
@@ -28,6 +32,6 @@
     </header>
 
     <section class="rounded-lg border p-4">
-        <button on:click={deleteGame} class="p-2 font-bold text-red-500">Delete Game</button>
+        <button onclick={deleteGame} class="p-2 font-bold text-red-500">Delete Game</button>
     </section>
 </main>

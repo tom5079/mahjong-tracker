@@ -1,10 +1,14 @@
 <script lang="ts">
     import { DateTime } from 'luxon'
 
-    export let name: string
 
-    export let min: string | undefined = undefined
-    export let required: boolean | undefined = undefined
+    interface Props {
+        name: string;
+        min?: string | undefined;
+        required?: boolean | undefined;
+    }
+
+    let { name, min = undefined, required = undefined }: Props = $props();
 
     const timezone = DateTime.local().zone.offsetName(0, { format: 'short' })
 </script>

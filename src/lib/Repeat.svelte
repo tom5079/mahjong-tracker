@@ -1,5 +1,9 @@
 <script lang="ts">
-    export let count: number
+    interface Props {
+        count: number;
+    }
+
+    let { count }: Props = $props();
 </script>
 
 <span class="flex justify-center space-x-2">

@@ -9,15 +9,19 @@
     import { DateTime } from 'luxon'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
 
-    let form: HTMLFormElement
-    let formData: Record<string, FormDataEntryValue>
+    let { data }: Props = $props();
 
-    let description = ''
-    let textarea: HTMLTextAreaElement
+    let form: HTMLFormElement = $state()
+    let formData: Record<string, FormDataEntryValue> = $state()
 
-    let error = ''
+    let description = $state('')
+    let textarea: HTMLTextAreaElement = $state()
+
+    let error = $state('')
 
     function onDescriptionInput() {
         textarea.style.height = 'auto'
@@ -66,7 +70,7 @@
 <main class="mx-auto max-w-2xl space-y-4 p-4">
     <h1 class="text-2xl">New event @ {data.parlor.name}</h1>
     <form
-        on:change={() => (formData = Object.fromEntries([...new FormData(form).entries()]))}
+        onchange={() => (formData = Object.fromEntries([...new FormData(form).entries()]))}
         bind:this={form}
     >
         <div class="flex flex-col space-y-4">
@@ -98,12 +102,12 @@
                 <textarea
                     bind:value={description}
                     bind:this={textarea}
-                    on:input={onDescriptionInput}
+                    oninput={onDescriptionInput}
                     class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                     rows="1"
                     id="description"
                     name="description"
-                />
+></textarea>
             </div>
             <div>
                 <div class="flex flex-row items-center justify-between py-2">
@@ -152,7 +156,7 @@
         </div>
         <div class="mt-8 flex flex-row items-center justify-end">
             <p class="flex-1 text-right font-bold text-red-500">{error}</p>
-            <button type="button" on:click={() => window.history.back()} class="p-2 px-5 py-4"
+            <button type="button" onclick={() => window.history.back()} class="p-2 px-5 py-4"
                 >Cancel</button
             >
             <button type="submit" class="rounded-lg bg-blue-500 p-2 px-5 py-4 text-white"

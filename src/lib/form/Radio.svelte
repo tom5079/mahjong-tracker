@@ -1,10 +1,14 @@
 <script lang="ts">
-    export let name: string
-    export let values: {
+    interface Props {
+        name: string;
+        values: {
         value: string
         label: string
-    }[]
-    export let selected: string | undefined
+    }[];
+        selected: string | undefined;
+    }
+
+    let { name, values, selected }: Props = $props();
 </script>
 
 <div class="flex flex-row space-x-2">

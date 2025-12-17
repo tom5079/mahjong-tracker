@@ -6,7 +6,11 @@
     import Search from '$lib/Search.svelte'
     import type { EventAttendee, User } from '@prisma/client'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
 
     export async function join(user: string) {
         window.grecaptcha.ready(() => {
@@ -66,7 +70,7 @@
                 <UserAvatar user={attendee.user} />
                 <p class="flex-grow">{attendee.user.username}</p>
                 <button
-                    on:click={() => decision(attendee.user.id, 'remove')}
+                    onclick={() => decision(attendee.user.id, 'remove')}
                     class="flex flex-row items-center rounded-lg border border-red-500 p-4 text-red-500 transition-all hover:bg-red-500 hover:text-white"
                     ><span class="material-symbols-rounded mr-2">close</span> Remove player</button
                 >
@@ -86,11 +90,11 @@
                 </div>
                 <div class="flex flex-row items-center space-x-4">
                     <button
-                        on:click={async () => await decision(joinRequest.user.id, 'accept')}
+                        onclick={async () => await decision(joinRequest.user.id, 'accept')}
                         class="rounded-lg bg-green-500 p-4 text-white">Accept</button
                     >
                     <button
-                        on:click={async () => await decision(joinRequest.user.id, 'reject')}
+                        onclick={async () => await decision(joinRequest.user.id, 'reject')}
                         class="rounded-lg bg-red-500 p-4 text-white">Reject</button
                     >
                 </div>

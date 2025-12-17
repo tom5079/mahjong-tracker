@@ -1,12 +1,22 @@
 <script lang="ts">
     import { convertWind } from './wind'
 
-    export let username: string
-    export let score: number
-    export let wind: number
-    export let richi: boolean
 
-    export let compareTo: number | null = null
+    interface Props {
+        username: string;
+        score: number;
+        wind: number;
+        richi: boolean;
+        compareTo?: number | null;
+    }
+
+    let {
+        username,
+        score,
+        wind,
+        richi,
+        compareTo = null
+    }: Props = $props();
 </script>
 
 <div

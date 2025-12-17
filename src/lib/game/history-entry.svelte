@@ -1,11 +1,21 @@
 <script lang="ts">
     import { convertWind } from './wind'
 
-    export let username: string
-    export let wind: number
-    export let score: number | undefined = undefined
-    export let richi: boolean | undefined = undefined
-    export let chonbo: boolean | undefined = undefined
+    interface Props {
+        username: string;
+        wind: number;
+        score?: number | undefined;
+        richi?: boolean | undefined;
+        chonbo?: boolean | undefined;
+    }
+
+    let {
+        username,
+        wind,
+        score = undefined,
+        richi = undefined,
+        chonbo = undefined
+    }: Props = $props();
 </script>
 
 <p class="flex flex-row items-center space-x-2">

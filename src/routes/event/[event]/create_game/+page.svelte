@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import type { PageData } from './$types'
     import Text from '$lib/form/Text.svelte'
     import Datetime from '$lib/form/Datetime.svelte'
@@ -14,25 +16,26 @@
     import { goto } from '$app/navigation'
     import UserAvatar from '$lib/UserAvatar.svelte'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
 
-    let error = ''
+    let { data }: Props = $props();
+
+    let error = $state('')
 
     const numPlayers = data.event.ruleset.player === 'FOUR' ? 4 : 3
 
-    let userSearch = ''
-    let searchResult = []
+    let userSearch = $state('')
+    let searchResult = $state([])
 
-    let form: HTMLFormElement
+    let form: HTMLFormElement = $state()
 
-    $: searchResult = data.attendees
-        .filter((x) => (userSearch ? x.username.includes(userSearch) : true))
-        .filter((x) => roster.every((it) => it.user.id !== x.id))
 
     let roster: {
         id: string
         user: User
-    }[] = []
+    }[] = $state([])
 
     function shuffle(array: any[]) {
         let currentIndex = array.length
@@ -117,6 +120,11 @@
     function handleRoster(event: CustomEvent) {
         roster = event.detail.items
     }
+    run(() => {
+        searchResult = data.attendees
+            .filter((x) => (userSearch ? x.username.includes(userSearch) : true))
+            .filter((x) => roster.every((it) => it.user.id !== x.id))
+    });
 </script>
 
 <main class="mx-auto max-w-2xl">
@@ -156,7 +164,7 @@
                             class="peer w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                         />
                         <button
-                            on:click={() => (roster = shuffle(roster))}
+                            onclick={() => (roster = shuffle(roster))}
                             type="button"
                             class="material-symbols-rounded ml-auto flex flex-row items-center rounded-lg bg-blue-500 p-2 text-white"
                         >
@@ -168,7 +176,7 @@
                             {#if searchResult.length > 0}
                                 {#each searchResult as user}
                                     <button
-                                        on:mousedown={() =>
+                                        onmousedown={() =>
                                             (roster = [...roster, { id: user.id, user }])}
                                         class="flex flex-row items-center space-x-2 py-4"
                                     >
@@ -184,8 +192,8 @@
                     <ol
                         class="flex flex-col"
                         use:dndzone={{ items: roster, flipDurationMs: 300 }}
-                        on:consider={handleRoster}
-                        on:finalize={handleRoster}
+                        onconsider={handleRoster}
+                        onfinalize={handleRoster}
                     >
                         {#each roster as player, i (player.id)}
                             <li
@@ -211,7 +219,7 @@
                                     <p class="pr-8">-</p>
                                 {/if}
                                 <button
-                                    on:click={() => {
+                                    onclick={() => {
                                         roster.splice(i, 1)
                                         roster = roster
                                     }}
@@ -224,7 +232,7 @@
                 <div class="flex flex-row items-center pt-4">
                     <p class="ml-auto font-bold text-red-500">{error}</p>
                     <button
-                        on:click={() => window.history.back()}
+                        onclick={() => window.history.back()}
                         class="p-4 font-semibold"
                         type="button">Cancel</button
                     >

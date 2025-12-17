@@ -1,7 +1,11 @@
 <script lang="ts">
     import type { PageData } from './$types'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
 </script>
 
 <main class="mx-auto max-w-2xl p-4">
