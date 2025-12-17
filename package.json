@@ -51,12 +51,13 @@
     },
     "type": "module",
     "dependencies": {
-        "drizzle-kit": "^0.30.6",
         "@prisma/client": "^5.20.0",
         "dotenv": "^16.4.7",
+        "drizzle-kit": "^0.30.6",
         "drizzle-orm": "^0.41.0",
         "luxon": "^3.5.0",
         "pg": "^8.14.1",
+        "protobufjs": "^8.0.0",
         "uuid": "^10.0.0"
     }
 }
