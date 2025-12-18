@@ -2,13 +2,13 @@
     import type { Ruleset } from '@prisma/client'
 
     interface Props {
-        ruleset: Ruleset;
-        readonly?: boolean;
+        ruleset: Ruleset
+        readonly?: boolean
     }
 
-    let { ruleset = $bindable(), readonly = false }: Props = $props();
+    let { ruleset = $bindable(), readonly = false }: Props = $props()
 
-    let textarea: HTMLTextAreaElement = $state()
+    let textarea: HTMLTextAreaElement | null = $state(null)
 
     let scoring: {
         kiriage: boolean
@@ -17,6 +17,10 @@
     } = $state({ kiriage: true, fixed30fu: false, tsumozon: true })
 
     function onNoteInput() {
+        if (textarea == null) {
+            return
+        }
+
         textarea.style.height = ''
         textarea.style.height = `min(${textarea.scrollHeight}px, 12rem)`
     }
@@ -174,7 +178,7 @@
                 class:after:translate-x-full={ruleset.uma.type === 'floating'}
                 class:after:border-white={ruleset.uma.type === 'floating'}
                 class:rtl:after:-translate-x-full={ruleset.uma.type === 'floating'}
-></div>
+            ></div>
         </button>
         {#if ruleset.uma.type === 'simple'}
             <div class="flex flex-row items-center space-x-2">
@@ -369,8 +373,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLastPlacement === 1}
                 class:text-white={ruleset.allLastPlacement === 1}
-                onclick={() =>
-                    (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 1)}
+                onclick={() => (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 1)}
             >
                 1st
             </button>
@@ -378,8 +381,7 @@
                 class="flex flex-1 items-center justify-center rounded-lg border py-4 text-center text-sm"
                 class:bg-blue-500={ruleset.allLastPlacement === 2}
                 class:text-white={ruleset.allLastPlacement === 2}
-                onclick={() =>
-                    (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 2)}
+                onclick={() => (ruleset.allLastPlacement = readonly ? ruleset.allLastPlacement : 2)}
             >
                 2st
             </button>
@@ -560,7 +562,7 @@
                 class:after:translate-x-full={scoring.kiriage}
                 class:after:border-white={scoring.kiriage}
                 class:rtl:after:-translate-x-full={scoring.kiriage}
-></div>
+            ></div>
         </button>
         <button
             type="button"
@@ -575,7 +577,7 @@
                 class:after:translate-x-full={scoring.fixed30fu}
                 class:after:border-white={scoring.fixed30fu}
                 class:rtl:after:-translate-x-full={scoring.fixed30fu}
-></div>
+            ></div>
         </button>
         {#if ruleset.player === 'THREE'}
             <button
@@ -591,7 +593,7 @@
                     class:after:translate-x-full={scoring.tsumozon}
                     class:after:border-white={scoring.tsumozon}
                     class:rtl:after:-translate-x-full={scoring.tsumozon}
-></div>
+                ></div>
             </button>
         {/if}
     </fieldset>
@@ -615,7 +617,7 @@
         <span class="text-sm font-medium text-gray-900">Nagashi is tsumo</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+        ></div>
     </label>
 
     <fieldset class="space-y-2 rounded-lg border border-gray-300 px-2 pb-2">
@@ -737,7 +739,7 @@
                 <span class="ms-3 text-sm font-medium text-gray-900">Chonbo affects score</span>
                 <div
                     class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                ></div>
             </label>
         </div>
     </fieldset>
@@ -747,7 +749,7 @@
         <span class="text-sm font-medium text-gray-900">Can give up dealership</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+        ></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center">
@@ -755,7 +757,7 @@
         <span class="text-sm font-medium text-gray-900">Tobi</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+        ></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center">
@@ -763,7 +765,7 @@
         <span class="text-sm font-medium text-gray-900">Tobi at Zero</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+        ></div>
     </label>
 
     <label class="inline-flex cursor-pointer items-center" class:hidden={ruleset.tobi}>
@@ -771,7 +773,7 @@
         <span class="text-sm font-medium text-gray-900">Riichi below 1000</span>
         <div
             class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+        ></div>
     </label>
 
     <div class="flex w-full flex-col space-y-2">
@@ -780,7 +782,7 @@
             <span class="text-sm font-medium text-gray-900">Sudden Death</span>
             <div
                 class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+            ></div>
         </label>
 
         <input
@@ -800,7 +802,7 @@
             <span class="text-sm font-medium text-gray-900">Called Game</span>
             <div
                 class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+            ></div>
         </label>
 
         <input
@@ -823,6 +825,6 @@
             rows="1"
             id="note"
             name="note"
-></textarea>
+        ></textarea>
     </div>
 </div>

@@ -7,17 +7,20 @@
     let error = $state('')
 
     let tags = $state('')
-    let textarea: HTMLTextAreaElement = $state()
+    let textarea: HTMLTextAreaElement | null = $state(null)
 
-    let form: HTMLFormElement = $state()
+    let form: HTMLFormElement | null = $state(null)
 
     function onTagInput() {
+        if (textarea == null) {
+            return
+        }
         textarea.style.height = ''
         textarea.style.height = `min(${textarea.scrollHeight}px, 12rem)`
     }
 
     onMount(() => {
-        form.addEventListener('submit', (event) => {
+        form?.addEventListener('submit', (event) => {
             event.preventDefault()
             window.grecaptcha.ready(() => {
                 window.grecaptcha
@@ -28,6 +31,9 @@
     })
 
     function onSubmit(token: string) {
+        if (form == null) {
+            return
+        }
         const formData = new FormData(form)
         formData.set('token', token)
 
@@ -107,7 +113,7 @@
                     rows="1"
                     id="tags"
                     name="tags"
-></textarea>
+                ></textarea>
             </div>
         </div>
         <div class="flex flex-row items-center justify-end space-x-4 px-4">
