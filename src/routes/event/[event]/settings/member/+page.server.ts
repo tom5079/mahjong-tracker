@@ -21,7 +21,7 @@ export const load = (async ({ params }) => {
                 status: schema.eventAttendee.status,
             })
             .from(schema.eventAttendee)
-            .innerJoin(schema.user, eq(schema.user, schema.eventAttendee.userId))
+            .innerJoin(schema.user, eq(schema.user.id, schema.eventAttendee.userId))
             .where(eq(schema.eventAttendee.eventId, eventId)),
     }
 }) satisfies PageServerLoad
