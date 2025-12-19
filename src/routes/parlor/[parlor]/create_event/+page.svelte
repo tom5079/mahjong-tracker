@@ -10,25 +10,32 @@
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 
-    let form: HTMLFormElement = $state()
-    let formData: Record<string, FormDataEntryValue> = $state()
+    let form: HTMLFormElement | null = $state(null)
+    let formData: Record<string, FormDataEntryValue> = $state({})
 
     let description = $state('')
-    let textarea: HTMLTextAreaElement = $state()
+    let textarea: HTMLTextAreaElement | null = $state(null)
 
     let error = $state('')
 
     function onDescriptionInput() {
+        if (textarea == null) {
+            return
+        }
+
         textarea.style.height = 'auto'
         textarea.style.height = `${textarea.scrollHeight}px`
     }
 
     onMount(() => {
+        if (form == null) {
+            return
+        }
         formData = Object.fromEntries([...new FormData(form).entries()])
         form.addEventListener('submit', async (event) => {
             event.preventDefault()
@@ -42,6 +49,9 @@
     })
 
     async function onSubmit(token: string) {
+        if (form == null) {
+            return
+        }
         const body = new FormData(form)
 
         body.set('token', token)
@@ -70,7 +80,12 @@
 <main class="mx-auto max-w-2xl space-y-4 p-4">
     <h1 class="text-2xl">New event @ {data.parlor.name}</h1>
     <form
-        onchange={() => (formData = Object.fromEntries([...new FormData(form).entries()]))}
+        onchange={() => {
+            if (form == null) {
+                return
+            }
+            formData = Object.fromEntries([...new FormData(form).entries()])
+        }}
         bind:this={form}
     >
         <div class="flex flex-col space-y-4">
@@ -107,7 +122,7 @@
                     rows="1"
                     id="description"
                     name="description"
-></textarea>
+                ></textarea>
             </div>
             <div>
                 <div class="flex flex-row items-center justify-between py-2">
