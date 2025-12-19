@@ -1,10 +1,10 @@
 <script lang="ts">
     interface Props {
-        scores: PrismaJson.Scores['dealer'];
-        onScore: (score: number) => void;
+        scores: PrismaJson.Score['dealer']
+        onScore: (score: number) => void
     }
 
-    let { scores, onScore }: Props = $props();
+    let { scores, onScore }: Props = $props()
 
     let category = $state([scores.ron])
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
+    import { run } from 'svelte/legacy'
 
     import type { PageData } from './$types'
     import Text from '$lib/form/Text.svelte'
@@ -17,20 +17,19 @@
     import UserAvatar from '$lib/UserAvatar.svelte'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 
     let error = $state('')
 
     const numPlayers = data.event.ruleset.player === 'FOUR' ? 4 : 3
 
     let userSearch = $state('')
-    let searchResult = $state([])
+    let searchResult: User[] = $state([])
 
-    let form: HTMLFormElement = $state()
-
+    let form: HTMLFormElement | null = $state(null)
 
     let roster: {
         id: string
@@ -55,7 +54,7 @@
     }
 
     onMount(() => {
-        form.addEventListener('submit', async (event) => {
+        form?.addEventListener('submit', async (event) => {
             event.preventDefault()
 
             window.grecaptcha.ready(() => {
@@ -67,6 +66,9 @@
     })
 
     async function onSubmit(token: string) {
+        if (form == null) {
+            return
+        }
         const body = new FormData(form)
         body.set('token', token)
 
@@ -124,7 +126,7 @@
         searchResult = data.attendees
             .filter((x) => (userSearch ? x.username.includes(userSearch) : true))
             .filter((x) => roster.every((it) => it.user.id !== x.id))
-    });
+    })
 </script>
 
 <main class="mx-auto max-w-2xl">
