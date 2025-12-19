@@ -1,16 +1,18 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
+    import { run } from 'svelte/legacy'
 
     import { type ScoringSheet, generateScoringSheet } from '$lib/scoring'
     import { onMount } from 'svelte'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
-    let form: HTMLFormElement = $state()
-    let formData: FormData | null = $state()
-    let formDataObject: { [key: string]: FormDataEntryValue } = $derived((formData && Object.fromEntries([...formData.entries()])) ?? {})
+    let form: HTMLFormElement | null = $state(null)
+    let formData: FormData | null = $state(null)
+    let formDataObject: { [key: string]: FormDataEntryValue } = $derived(
+        formData != null ? Object.fromEntries([...formData.entries()]) : {}
+    )
 
-    let note: string = $state()
-    let textarea: HTMLTextAreaElement = $state()
+    let note: string = $state('')
+    let textarea: HTMLTextAreaElement | null = $state(null)
 
     let scoring: {
         kiriage: boolean
@@ -35,17 +37,18 @@
 
     run(() => {
         scoringSheet = generateScoringSheet(scoring)
-    });
-
-    
+    })
 
     function onNoteInput() {
+        if (textarea == null) {
+            return
+        }
         textarea.style.height = ''
         textarea.style.height = `min(${textarea.scrollHeight}px, 12rem)`
     }
 
     onMount(() => {
-        form.addEventListener('submit', (e) => {
+        form?.addEventListener('submit', (e) => {
             e.preventDefault()
 
             window.grecaptcha.ready(() => {
@@ -57,6 +60,9 @@
     })
 
     async function onSubmit(token: string) {
+        if (form == null) {
+            return
+        }
         const formData = new FormData(form)
 
         formData.set('token', token)
@@ -83,7 +89,15 @@
         <h1 class="text-2xl font-bold">Create new ruleset</h1>
     </section>
     <section>
-        <form bind:this={form} onchange={(_) => (formData = new FormData(form))}>
+        <form
+            bind:this={form}
+            onchange={(_) => {
+                if (form == null) {
+                    return
+                }
+                formData = new FormData(form)
+            }}
+        >
             <div class="grid gap-6 py-4">
                 <div>
                     <label for="name" class="mb-2 block text-sm font-medium text-gray-900"
@@ -217,7 +231,7 @@
                             class:after:translate-x-full={uma.type === 'floating'}
                             class:after:border-white={uma.type === 'floating'}
                             class:rtl:after:-translate-x-full={uma.type === 'floating'}
-></div>
+                        ></div>
                     </button>
                     {#if uma.type === 'simple'}
                         <div class="flex flex-row items-center space-x-2">
@@ -706,7 +720,7 @@
                             class:after:translate-x-full={scoring.kiriage}
                             class:after:border-white={scoring.kiriage}
                             class:rtl:after:-translate-x-full={scoring.kiriage}
-></div>
+                        ></div>
                     </button>
                     <button
                         type="button"
@@ -725,7 +739,7 @@
                             class:after:translate-x-full={scoring.fixed30fu}
                             class:after:border-white={scoring.fixed30fu}
                             class:rtl:after:-translate-x-full={scoring.fixed30fu}
-></div>
+                        ></div>
                     </button>
                     {#if formDataObject?.player === 'three'}
                         <button
@@ -745,7 +759,7 @@
                                 class:after:translate-x-full={scoring.tsumozon}
                                 class:after:border-white={scoring.tsumozon}
                                 class:rtl:after:-translate-x-full={scoring.tsumozon}
-></div>
+                            ></div>
                         </button>
                     {/if}
                 </fieldset>
@@ -771,7 +785,7 @@
                     <span class="text-sm font-medium text-gray-900">Nagashi is tsumo</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                    ></div>
                 </label>
 
                 <fieldset class="space-y-2 rounded-lg border border-gray-300 px-2 pb-2">
@@ -895,7 +909,7 @@
                             >
                             <div
                                 class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                            ></div>
                         </label>
                     </div>
                 </fieldset>
@@ -905,7 +919,7 @@
                     <span class="text-sm font-medium text-gray-900">Can give up dealership</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                    ></div>
                 </label>
 
                 <label class="inline-flex cursor-pointer items-center">
@@ -913,7 +927,7 @@
                     <span class="text-sm font-medium text-gray-900">Tobi</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                    ></div>
                 </label>
 
                 <label class="inline-flex cursor-pointer items-center">
@@ -921,7 +935,7 @@
                     <span class="text-sm font-medium text-gray-900">Tobi at Zero</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                    ></div>
                 </label>
 
                 <label
@@ -932,7 +946,7 @@
                     <span class="text-sm font-medium text-gray-900">Riichi below 1000</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                    ></div>
                 </label>
 
                 <div class="flex w-full flex-col space-y-2">
@@ -941,7 +955,7 @@
                         <span class="text-sm font-medium text-gray-900">Sudden Death</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                        ></div>
                     </label>
 
                     <input
@@ -961,7 +975,7 @@
                         <span class="text-sm font-medium text-gray-900">Called Game</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
-></div>
+                        ></div>
                     </label>
 
                     <input
@@ -986,7 +1000,7 @@
                         rows="1"
                         id="note"
                         name="note"
-></textarea>
+                    ></textarea>
                 </div>
             </div>
             <div class="flex flex-row items-center space-x-4">
