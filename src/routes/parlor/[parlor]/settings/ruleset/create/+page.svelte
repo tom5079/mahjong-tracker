@@ -2,17 +2,10 @@
     import { run } from 'svelte/legacy'
 
     import { type ScoringSheet, generateScoringSheet } from '$lib/scoring'
-    import { onMount } from 'svelte'
-    import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
-
-    let form: HTMLFormElement | null = $state(null)
-    let formData: FormData | null = $state(null)
-    let formDataObject: { [key: string]: FormDataEntryValue } = $derived(
-        formData != null ? Object.fromEntries([...formData.entries()]) : {}
-    )
+    import Form from '$lib/form/Form.svelte'
+    import type { FormEventHandler } from 'svelte/elements'
 
     let note: string = $state('')
-    let textarea: HTMLTextAreaElement | null = $state(null)
 
     let scoring: {
         kiriage: boolean
@@ -33,54 +26,33 @@
         affectsScore: true,
     })
 
+    let player = $state('four')
+
+    let alllast = $state('agariyame')
+
+    let tobi = $state(false)
+
+    let suddenDeath = $state(false)
+
+    let calledGame = $state(false)
+
     let error = $state('')
 
     run(() => {
         scoringSheet = generateScoringSheet(scoring)
     })
 
-    function onNoteInput() {
-        if (textarea == null) {
-            return
-        }
-        textarea.style.height = ''
-        textarea.style.height = `min(${textarea.scrollHeight}px, 12rem)`
+    const onNoteInput: FormEventHandler<HTMLTextAreaElement> = (event) => {
+        event.currentTarget.style.height = ''
+        event.currentTarget.style.height = `min(${event.currentTarget.scrollHeight}px, 12rem)`
     }
 
-    onMount(() => {
-        form?.addEventListener('submit', (e) => {
-            e.preventDefault()
-
-            window.grecaptcha.ready(() => {
-                window.grecaptcha
-                    .execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
-                    .then(onSubmit)
-            })
-        })
-    })
-
-    async function onSubmit(token: string) {
-        if (form == null) {
-            return
-        }
-        const formData = new FormData(form)
-
-        formData.set('token', token)
-
+    async function onSubmit(formData: FormData) {
         formData.set('scoring', JSON.stringify(scoring))
         formData.set('uma', JSON.stringify(uma))
         formData.set('chonbo', JSON.stringify(chonbo))
 
-        fetch('create', {
-            method: 'POST',
-            body: formData,
-        }).then(async (res) => {
-            if (res.ok) {
-                window.history.back()
-            } else {
-                error = (await res.json()).message
-            }
-        })
+        return formData
     }
 </script>
 
@@ -89,15 +61,7 @@
         <h1 class="text-2xl font-bold">Create new ruleset</h1>
     </section>
     <section>
-        <form
-            bind:this={form}
-            onchange={(_) => {
-                if (form == null) {
-                    return
-                }
-                formData = new FormData(form)
-            }}
-        >
+        <Form {onSubmit}>
             <div class="grid gap-6 py-4">
                 <div>
                     <label for="name" class="mb-2 block text-sm font-medium text-gray-900"
@@ -123,7 +87,7 @@
                                 id="four-players"
                                 name="player"
                                 value="four"
-                                checked
+                                bind:group={player}
                             />
                             <label
                                 class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
@@ -137,6 +101,7 @@
                                 id="three-players"
                                 name="player"
                                 value="three"
+                                bind:group={player}
                             />
                             <label
                                 class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
@@ -252,7 +217,7 @@
                                 bind:value={uma.uma[2]}
                                 class="w-0 flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                             />
-                            {#if formDataObject?.player !== 'three'}
+                            {#if player !== 'three'}
                                 <span class="text-sm text-gray-900">-</span>
                                 <input
                                     type="number"
@@ -282,7 +247,7 @@
                                     bind:value={value[2]}
                                     class="w-0 flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                                 />
-                                {#if formDataObject?.player !== 'three'}
+                                {#if player !== 'three'}
                                     <span class="text-sm text-gray-900">-</span>
                                     <input
                                         type="number"
@@ -458,7 +423,7 @@
                                 id="alllast_agariyame"
                                 name="alllast"
                                 value="agariyame"
-                                checked
+                                bind:group={alllast}
                             />
                             <label
                                 class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
@@ -472,6 +437,7 @@
                                 id="alllast_tenpaiyame"
                                 name="alllast"
                                 value="tenpaiyame"
+                                bind:group={alllast}
                             />
                             <label
                                 class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
@@ -485,6 +451,7 @@
                                 id="alllast_none"
                                 name="alllast"
                                 value="none"
+                                bind:group={alllast}
                             />
                             <label
                                 class="flex h-full cursor-pointer items-center justify-center rounded-lg border py-4 text-center text-sm peer-checked:bg-blue-500 peer-checked:text-white"
@@ -492,10 +459,7 @@
                             >
                         </div>
                     </div>
-                    <div
-                        class="flex flex-row space-x-2"
-                        class:hidden={formDataObject?.alllast === 'none'}
-                    >
+                    <div class="flex flex-row space-x-2" class:hidden={alllast === 'none'}>
                         <div class="flex-1">
                             <input
                                 class="peer hidden h-0 w-0"
@@ -741,7 +705,7 @@
                             class:rtl:after:-translate-x-full={scoring.fixed30fu}
                         ></div>
                     </button>
-                    {#if formDataObject?.player === 'three'}
+                    {#if player === 'three'}
                         <button
                             type="button"
                             onclick={() =>
@@ -923,7 +887,7 @@
                 </label>
 
                 <label class="inline-flex cursor-pointer items-center">
-                    <input type="checkbox" name="tobi" class="peer sr-only" checked />
+                    <input type="checkbox" name="tobi" class="peer sr-only" bind:checked={tobi} />
                     <span class="text-sm font-medium text-gray-900">Tobi</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
@@ -938,11 +902,8 @@
                     ></div>
                 </label>
 
-                <label
-                    class="inline-flex cursor-pointer items-center"
-                    class:hidden={formDataObject?.tobi === 'on'}
-                >
-                    <input type="checkbox" name="riichiBelow1000" class="peer sr-only" checked />
+                <label class="inline-flex cursor-pointer items-center" class:hidden={tobi}>
+                    <input type="checkbox" name="riichiBelow1000" class="peer sr-only" />
                     <span class="text-sm font-medium text-gray-900">Riichi below 1000</span>
                     <div
                         class="peer relative ml-auto h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
@@ -951,7 +912,12 @@
 
                 <div class="flex w-full flex-col space-y-2">
                     <label class="flex w-full cursor-pointer flex-row items-center justify-between">
-                        <input type="checkbox" name="suddenDeath" class="peer sr-only" />
+                        <input
+                            type="checkbox"
+                            name="suddenDeath"
+                            class="peer sr-only"
+                            bind:checked={suddenDeath}
+                        />
                         <span class="text-sm font-medium text-gray-900">Sudden Death</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
@@ -965,13 +931,18 @@
                         value="40000"
                         step="1000"
                         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        class:hidden={formDataObject?.suddenDeath !== 'on'}
+                        class:hidden={!suddenDeath}
                     />
                 </div>
 
                 <div class="flex w-full flex-col space-y-2">
                     <label class="flex w-full cursor-pointer flex-row items-center justify-between">
-                        <input type="checkbox" name="calledGame" class="peer sr-only" />
+                        <input
+                            type="checkbox"
+                            name="calledGame"
+                            class="peer sr-only"
+                            bind:checked={calledGame}
+                        />
                         <span class="text-sm font-medium text-gray-900">Called Game</span>
                         <div
                             class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 rtl:peer-checked:after:-translate-x-full"
@@ -985,7 +956,7 @@
                         value="55000"
                         step="1000"
                         class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        class:hidden={formDataObject?.calledGame !== 'on'}
+                        class:hidden={!calledGame}
                     />
                 </div>
                 <div>
@@ -994,7 +965,6 @@
                     >
                     <textarea
                         bind:value={note}
-                        bind:this={textarea}
                         oninput={onNoteInput}
                         class="block w-full resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                         rows="1"
@@ -1012,6 +982,6 @@
                     Create
                 </button>
             </div>
-        </form>
+        </Form>
     </section>
 </main>

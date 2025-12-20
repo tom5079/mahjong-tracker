@@ -2,10 +2,10 @@
     import type { PageData } from './$types'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 </script>
 
 <main class="mx-auto max-w-2xl p-4">
