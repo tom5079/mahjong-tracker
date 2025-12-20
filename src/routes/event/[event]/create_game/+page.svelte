@@ -24,7 +24,7 @@
 
     let error = $state('')
 
-    const numPlayers = data.event.ruleset.player === 'FOUR' ? 4 : 3
+    const numPlayers = data.playerPerGame === 'FOUR' ? 4 : 3
 
     let userSearch = $state('')
     let searchResult: User[] = $state([])
@@ -131,7 +131,7 @@
 
 <main class="mx-auto max-w-2xl">
     <section class="p-4">
-        <h1 class="text-2xl font-semibold">New Game @ {data.event.name}</h1>
+        <h1 class="text-2xl font-semibold">New Game @ {data.eventName}</h1>
     </section>
     <section>
         <form bind:this={form}>

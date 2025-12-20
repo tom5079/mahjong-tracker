@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
-import { db, schema } from '$lib/server/drizzle'
+import { db, oneOrThrow, schema } from '$lib/server/drizzle'
 import { eq, and } from 'drizzle-orm'
 
 export const load = (async ({ params }) => {
@@ -25,7 +25,17 @@ export const load = (async ({ params }) => {
             )
         )
 
+    const playerPerGame = await db
+        .select({
+            playerPerGame: schema.ruleset.player,
+        })
+        .from(schema.event)
+        .innerJoin(schema.ruleset, eq(schema.ruleset.id, schema.event.rulesetId))
+        .where(eq(schema.event.id, eventId))
+        .then(oneOrThrow)
+
     return {
         attendees,
+        playerPerGame,
     }
 }) satisfies PageServerLoad

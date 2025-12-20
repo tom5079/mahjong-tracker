@@ -124,7 +124,7 @@
         <div class="flex flex-row items-center justify-between">
             <h2 class="text-xl font-semibold">Games</h2>
             <a
-                href="{data.eventId}/create_game"
+                href="/event/{data.eventId}/create_game"
                 class="flex flex-row rounded-lg bg-blue-500 p-4 text-white"
             >
                 <span class="material-symbols-rounded">add</span> New Game
