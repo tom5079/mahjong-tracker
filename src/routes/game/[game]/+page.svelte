@@ -1,5 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: can't migrate `let error = ''` to `$state` because there's a variable named state.
      Rename the variable and try again or migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let error = ''` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
     import Richi from '$lib/Richi.svelte'
     import Repeat from '$lib/Repeat.svelte'

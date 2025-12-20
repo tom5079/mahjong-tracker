@@ -10,20 +10,24 @@
     import UserAvatar from '$lib/UserAvatar.svelte'
     import PlayerScore from '$lib/game/player-score.svelte'
 
-    export let data: PageData
+    interface Props {
+        data: PageData;
+    }
 
-    $: states = data.games.map((game) => ({
+    let { data }: Props = $props();
+
+    let states = $derived(data.games.map((game) => ({
         game,
         state: computeState({
             players: game.players.map((player) => player.user),
             ruleset: data.ruleset,
             actions: game.actions,
         }),
-    }))
+    })))
 
-    $: currentPage = +($page.url.searchParams.get('page') ?? 1)
+    let currentPage = $derived(+($page.url.searchParams.get('page') ?? 1))
 
-    $: leaderboard = Object.entries(
+    let leaderboard = $derived(Object.entries(
         states.reduce<Record<string, [number, number]>>(
             (acc, { state }) => {
                 if (!state.ok) return acc
@@ -40,7 +44,7 @@
             },
             Object.fromEntries(data.attendees.map((attendee) => [attendee.userId, [0, 0]]))
         )
-    ).sort((a, b) => b[1][0] - a[1][0])
+    ).sort((a, b) => b[1][0] - a[1][0]))
 
     onMount(() => {
         const refresh = setInterval(() => {
@@ -81,13 +85,13 @@
                 </p>
             {:else if data.joinRequestStatus === 'REJECTED'}
                 <button
-                    on:click={join}
+                    onclick={join}
                     class="flex flex-row items-center rounded-lg border border-red-500 p-4 text-sm text-red-500 transition duration-300 hover:bg-red-500 hover:text-white"
                 >
                     <span class="material-symbols-rounded mr-2">close</span>Join request rejected
                 </button>
             {:else}
-                <button on:click={join} class="flex flex-row rounded-lg bg-blue-500 p-4 text-white">
+                <button onclick={join} class="flex flex-row rounded-lg bg-blue-500 p-4 text-white">
                     <span class="material-symbols-rounded mr-2">people</span> Join
                 </button>
             {/if}
@@ -133,7 +137,7 @@
         <div class="mx-auto w-fit divide-x overflow-clip rounded-lg border">
             {#each { length: Math.ceil(data.games.length / 10) } as _, page}
                 <button
-                    on:click={() => goto(`?page=${page + 1}`)}
+                    onclick={() => goto(`?page=${page + 1}`)}
                     class="px-6 py-4 text-lg"
                     class:bg-blue-500={currentPage === page + 1}
                     class:text-white={currentPage === page + 1}
@@ -247,7 +251,7 @@
     <div class="mx-auto mb-4 w-fit divide-x overflow-clip rounded-lg border">
         {#each { length: Math.ceil(data.games.length / 10) } as _, page}
             <button
-                on:click={() => goto(`?page=${page + 1}`)}
+                onclick={() => goto(`?page=${page + 1}`)}
                 class="px-6 py-4 text-lg"
                 class:bg-blue-500={currentPage === page + 1}
                 class:text-white={currentPage === page + 1}
