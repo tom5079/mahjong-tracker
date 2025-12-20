@@ -3,10 +3,10 @@
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 
     function deleteEvent() {
         window.grecaptcha.ready(() => {
@@ -14,7 +14,7 @@
                 .execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'delete_event' })
                 .then(async (token) => {
                     await fetch('general', { method: 'DELETE', body: token })
-                    window.location.href = '/parlor/' + data.event.parlorId
+                    window.location.href = '/parlor/' + data.parlorId
                 })
         })
     }
@@ -23,7 +23,7 @@
 <main class="mx-auto max-w-2xl">
     <section class="p-4">
         <h1 class="text-2xl font-bold">
-            {data.event.name} @ {data.event.parlor.name} Settings
+            {data.eventName} @ {data.parlorName} Settings
         </h1>
     </section>
     <section class="px-4">

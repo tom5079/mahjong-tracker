@@ -14,6 +14,7 @@ export const load = (async ({ params }) => {
         .select({
             eventId: schema.event.id,
             eventName: schema.event.name,
+            parlorId: schema.parlor.id,
             parlorName: schema.parlor.name,
         })
         .from(schema.event)
