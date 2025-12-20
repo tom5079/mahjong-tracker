@@ -2,16 +2,16 @@
     import type { PageData } from './$types'
 
     interface Props {
-        data: PageData;
+        data: PageData
     }
 
-    let { data }: Props = $props();
+    let { data }: Props = $props()
 </script>
 
 <main class="mx-auto max-w-2xl">
     <section class="p-4">
         <h1 class="text-2xl font-bold">
-            {data.event.name} @ {data.event.parlor.name} Settings
+            {data.eventName} @ {data.parlorName} Settings
         </h1>
     </section>
     <section class="m-4 divide-y rounded-xl border">
