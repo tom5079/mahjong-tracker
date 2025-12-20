@@ -70,7 +70,7 @@ export const load = (async ({ cookies, params, url }) => {
         })
         .from(schema.ruleset)
         .innerJoin(schema.event, eq(schema.event.rulesetId, schema.ruleset.id))
-        .where(eq(schema.ruleset.id, schema.event.rulesetId))
+        .where(eq(schema.event.id, eventId))
         .then(oneOrThrow)
 
     const startScore = await db
