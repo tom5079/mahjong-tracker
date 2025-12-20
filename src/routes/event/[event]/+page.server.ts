@@ -3,6 +3,8 @@ import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 import { getSessionId } from '$lib/server/session'
 import { getUser } from '$lib/server/user'
+import { db, oneOrThrow, schema } from '$lib/server/drizzle'
+import { eq, getTableColumns } from 'drizzle-orm'
 
 export const load = (async ({ cookies, params, url }) => {
     const eventId = +(params.event ?? NaN)
@@ -61,5 +63,28 @@ export const load = (async ({ cookies, params, url }) => {
         },
     })
 
-    return { joinRequestStatus: joinRequest?.status, games, attendees }
+    // To be removed
+    const ruleset = await db
+        .select({
+            ...getTableColumns(schema.ruleset),
+        })
+        .from(schema.ruleset)
+        .innerJoin(schema.event, eq(schema.event.rulesetId, schema.ruleset.id))
+        .where(eq(schema.ruleset.id, schema.event.rulesetId))
+        .then(oneOrThrow)
+
+    const startScore = await db
+        .select({ startScore: schema.ruleset.startScore })
+        .from(schema.event)
+        .innerJoin(schema.ruleset, eq(schema.ruleset.id, schema.event.rulesetId))
+        .where(eq(schema.event.id, eventId))
+        .then(oneOrThrow)
+
+    return {
+        joinRequestStatus: joinRequest?.status,
+        games,
+        attendees,
+        startScore: startScore?.startScore,
+        ruleset,
+    }
 }) satisfies PageServerLoad

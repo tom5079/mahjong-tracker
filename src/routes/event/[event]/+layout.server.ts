@@ -1,4 +1,5 @@
-import prisma from '$lib/server/prisma'
+import { eq } from 'drizzle-orm'
+import { db, schema } from '$lib/server/drizzle'
 import { error } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
 
@@ -9,19 +10,22 @@ export const load = (async ({ params }) => {
         error(404, 'Event not found')
     }
 
-    const event = await prisma.event.findUnique({
-        where: {
-            id: eventId,
-        },
-        include: {
-            ruleset: true,
-            parlor: true,
-        },
-    })
+    const eventInfo = await db
+        .select({
+            eventId: schema.event.id,
+            eventName: schema.event.name,
+            parlorName: schema.parlor.name,
+        })
+        .from(schema.event)
+        .innerJoin(schema.parlor, eq(schema.parlor.id, schema.event.parlorId))
+        .where(eq(schema.event.id, eventId))
+        .then((rows) => {
+            if (rows.length !== 1) {
+                error(404, 'Event not found')
+            }
 
-    if (event == null) {
-        error(404, 'Event not found')
-    }
+            return rows[0]
+        })
 
-    return { event }
+    return eventInfo
 }) satisfies LayoutServerLoad

@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<th>` must be the child of a `<tr>`, not a `<div>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
-https://svelte.dev/e/node_invalid_placement -->
 <script lang="ts">
     import { invalidateAll } from '$app/navigation'
     import { computeState } from '$lib/game/state'
@@ -18,7 +16,7 @@ https://svelte.dev/e/node_invalid_placement -->
         game,
         state: computeState({
             players: game.players.map((player) => player.user),
-            ruleset: data.event.ruleset,
+            ruleset: data.ruleset,
             actions: game.actions,
         }),
     }))
@@ -57,7 +55,7 @@ https://svelte.dev/e/node_invalid_placement -->
             window.grecaptcha
                 .execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
                 .then(async (token) => {
-                    await fetch(`${data.event.id}/join`, {
+                    await fetch(`${data.eventId}/join`, {
                         method: 'POST',
                         body: JSON.stringify({ token }),
                     })
@@ -71,7 +69,7 @@ https://svelte.dev/e/node_invalid_placement -->
     <section class="p-4">
         <div class="flex flex-row items-center">
             <h1 class="mr-auto text-2xl font-bold">
-                {data.event.name} @ {data.event.parlor.name}
+                {data.eventName} @ {data.parlorName}
             </h1>
             {#if data.joinRequestStatus === 'PENDING'}
                 <p class="flex flex-row items-center p-4 text-sm text-violet-500">
@@ -94,7 +92,7 @@ https://svelte.dev/e/node_invalid_placement -->
                 </button>
             {/if}
             <a
-                href="{data.event.id}/settings"
+                href="{data.eventId}/settings"
                 class="material-symbols-rounded filled px-5 py-2.5 text-2xl">settings</a
             >
         </div>
@@ -126,7 +124,7 @@ https://svelte.dev/e/node_invalid_placement -->
         <div class="flex flex-row items-center justify-between">
             <h2 class="text-xl font-semibold">Games</h2>
             <a
-                href="{data.event.id}/create_game"
+                href="{data.eventId}/create_game"
                 class="flex flex-row rounded-lg bg-blue-500 p-4 text-white"
             >
                 <span class="material-symbols-rounded">add</span> New Game
@@ -223,10 +221,10 @@ https://svelte.dev/e/node_invalid_placement -->
                                     {:else}
                                         <td
                                             class="relative"
-                                            class:text-blue-500={score >
-                                                data.event.ruleset.startScore}
-                                            class:text-red-500={score <
-                                                data.event.ruleset.startScore}
+                                            class:text-blue-500={data.startScore != null &&
+                                                score > data.startScore}
+                                            class:text-red-500={data.startScore != null &&
+                                                score < data.startScore}
                                         >
                                             {#if score < 0}<span class="absolute -left-2">-</span
                                                 >{/if}

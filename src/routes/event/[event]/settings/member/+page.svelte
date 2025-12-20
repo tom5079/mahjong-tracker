@@ -16,7 +16,7 @@
             window.grecaptcha
                 .execute(PUBLIC_CAPTCHA_CLIENT_KEY, { action: 'submit' })
                 .then(async (token) => {
-                    await fetch(`/event/${data.event.id}/join`, {
+                    await fetch(`/event/${data.eventId}/join`, {
                         method: 'POST',
                         body: JSON.stringify({
                             token,
@@ -53,7 +53,7 @@
 <main class="mx-auto max-w-2xl">
     <section class="p-4">
         <h1 class="text-2xl font-bold">
-            {data.event.name} @ {data.event.parlor.name} Settings
+            {data.eventName} @ {data.parlorName} Settings
         </h1>
     </section>
     <section class="p-4">
