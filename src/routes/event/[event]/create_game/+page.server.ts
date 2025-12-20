@@ -36,6 +36,6 @@ export const load = (async ({ params }) => {
 
     return {
         attendees,
-        playerPerGame,
+        playerPerGame: playerPerGame.playerPerGame,
     }
 }) satisfies PageServerLoad
