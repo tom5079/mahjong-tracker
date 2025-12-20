@@ -187,19 +187,19 @@
                                 }
                                 return b.score - a.score
                             }) as player}
-                                <td class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</td>
-                                <td class="truncate pr-8">
+                                <div class="pr-2 font-mj">{'東南西北'.charAt(player.wind)}</div>
+                                <div class="truncate pr-8">
                                     {player.user.username}
-                                </td>
+                                </div>
                                 {#if state.value.match.state === 'ENDED'}
                                     {@const score = state.value.match.result.find(
                                         (p) => p.player === player.user.id
                                     )}
                                     {#if score == null}
-                                        <td class="text-red-500">Error</td>
+                                        <div class="text-red-500">Error</div>
                                     {:else}
                                         {@const finalScore = score.soten - score.penalty}
-                                        <td
+                                        <div
                                             class="relative"
                                             class:text-blue-500={finalScore > 0}
                                             class:text-red-500={finalScore < 0}
@@ -210,16 +210,16 @@
                                             <span>
                                                 {Math.abs(finalScore) / 10}
                                             </span>
-                                        </td>
+                                        </div>
                                     {/if}
                                 {:else if game.timer.state !== 'waiting'}
                                     {@const score = state.value.players.find(
                                         (p) => p.user.id === player.user.id
                                     )?.score}
                                     {#if score == null}
-                                        <td class="text-red-500">Error</td>
+                                        <div class="text-red-500">Error</div>
                                     {:else}
-                                        <td
+                                        <div
                                             class="relative"
                                             class:text-blue-500={data.startScore != null &&
                                                 score > data.startScore}
@@ -231,10 +231,10 @@
                                             <span>
                                                 {Math.abs(score)}
                                             </span>
-                                        </td>
+                                        </div>
                                     {/if}
                                 {:else}
-                                    <p />
+                                    <p></p>
                                 {/if}
                             {/each}
                         </div>

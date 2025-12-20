@@ -958,7 +958,7 @@
                                     {/if}
                                 </div>
                             </div>
-                            <div class="my-4 h-px w-full bg-slate-300" />
+                            <div class="my-4 h-px w-full bg-slate-300"></div>
                         {/each}
                     </div>
                 </section>
