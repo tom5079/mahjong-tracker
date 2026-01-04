@@ -1,15 +1,12 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation'
-    import type { PageData } from './$types'
+    import type { PageProps } from './$types'
     import { PUBLIC_CAPTCHA_CLIENT_KEY } from '$env/static/public'
     import UserAvatar from '$lib/UserAvatar.svelte'
     import Search from './Search.svelte'
+    import { searchUsers as remoteSearchUsers } from './search.remote'
 
-    interface Props {
-        data: PageData
-    }
-
-    let { data }: Props = $props()
+    let { data }: PageProps = $props()
 
     export async function join(user: string) {
         window.grecaptcha.ready(() => {
@@ -48,6 +45,10 @@
                 })
         })
     }
+
+    function searchUsers(searchTerm: string) {
+        return remoteSearchUsers({ searchTerm, eventId: data.eventId })
+    }
 </script>
 
 <main class="mx-auto max-w-2xl">
@@ -58,7 +59,7 @@
     </section>
     <section class="p-4">
         <h2 class="text-xl font-semibold">Add Player</h2>
-        <Search {join} />
+        <Search {join} {searchUsers} />
     </section>
     <section>
         <h2 class="p-4 text-xl font-semibold">

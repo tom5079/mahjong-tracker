@@ -1,13 +1,13 @@
 <script lang="ts">
     import type { User } from '@prisma/client'
     import UserAvatar from '$lib/UserAvatar.svelte'
-    import { searchUsers } from './search.remote'
 
     interface Props {
         join: (user: string) => Promise<void>
+        searchUsers: (searchTerm: string) => Promise<User[]>
     }
 
-    let { join }: Props = $props()
+    let { join, searchUsers }: Props = $props()
 
     let query: string = $state('')
 
