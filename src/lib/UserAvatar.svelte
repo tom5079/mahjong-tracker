@@ -17,16 +17,13 @@
 
 {#if user}
     <div class={`overflow-hidden rounded-full ${sizeToClassMap[size]}`}>
-        <object
-            data="https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.webp"
-            type="image/webp"
-            title="avatar of {user.username}"
+        <img
+            src="https://cdn.discordapp.com/avatars/{user.id}/{user.avatar}.webp"
+            alt="avatar of {user.username}"
             class="h-full w-full"
-        >
-            <img
-                src="https://cdn.discordapp.com/emojis/1235123039956500491.webp?size=96"
-                alt="avatar of {user.username}"
-            />
-        </object>
+            onerror={(e) =>
+                ((e.currentTarget as HTMLImageElement).src =
+                    'https://cdn.discordapp.com/emojis/1235123039956500491.webp?size=96')}
+        />
     </div>
 {/if}

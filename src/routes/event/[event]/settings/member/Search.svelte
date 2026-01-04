@@ -40,7 +40,7 @@
         <div
             class="absolute -left-1 top-10 hidden w-[calc(100%-0.5rem)] flex-col divide-y rounded-lg border border-gray-300 bg-gray-50 p-2 shadow-lg peer-focus:flex"
         >
-            {#each await searchResults as user}
+            {#each searchResults as user}
                 <button
                     onmousedown={() => join(user.id)}
                     class="flex flex-row items-center space-x-2 py-4"
